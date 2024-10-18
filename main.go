@@ -95,7 +95,16 @@ func handleClick(w http.ResponseWriter, r *http.Request) {
 	
 			// If the player matched the pattern, update the score
 			if matches && len(game.Pattern) >= 3 {
-				game.Score++
+				game.Score+=10
+				if len(game.Pattern) >= 5{
+					game.Score+=20
+				}
+				if len(game.Pattern) >= 8{
+					game.Score+=40
+				}
+				if len(game.Pattern) >= 10{
+					game.Score+=80
+				}	
 				log.Printf("Pattern matched! Score incremented to: %d", game.Score)
 			}
 			// if (game.PlayerClicksLeft==0){

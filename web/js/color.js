@@ -62,6 +62,7 @@ function playInstrument() {
           await currentAudio;
         } catch (error) {
           console.log(error);
+          alert(error);
         }
         await sendClickData(buttonData, true);
       } else {
