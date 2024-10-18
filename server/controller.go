@@ -5,16 +5,6 @@ import (
 	"net/http"
 	"sync"
 )
-type Account struct{
-	id int 
-	userName string
-}
-
-type Gamer struct{
-	id int 
-	userName string
-	topScore int64
-}
 
 type ButtonClick struct {
 	Color string `json:"color"`
@@ -53,17 +43,11 @@ func GetPattern(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"pattern": Game.Pattern,
+		"PlayerTurn": Game.PlayerTurn,
 		"score":   Game.Score,
 		"playerClicksLeft": Game.PlayerClicksLeft,
 		"isLocked": Game.IsLocked,
 	})
 }
 
-func Authentication(){
-	
-}
-
-func TopScorers (){
-
-}
 

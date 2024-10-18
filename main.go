@@ -14,7 +14,6 @@ func main() {
 
 	http.HandleFunc("/api/click", handleClick)
 	http.HandleFunc("/api/lock", handleLock)
-	// http.HandleFunc("/api/unlock", handleUnlock)
 	http.HandleFunc("/api/pattern", server.GetPattern)
 	http.HandleFunc("/api/reset", handleReset)
 	
@@ -144,48 +143,6 @@ func handleLock(w http.ResponseWriter, r *http.Request) {
 
 	})
 }
-
-// func handleUnlock(w http.ResponseWriter, r *http.Request) {
-// 	log.Printf("Unlocking...")
-// 	if r.Method != http.MethodPost {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	game.mu.Lock()
-// 	defer game.mu.Unlock()
-
-// 	game.IsLocked = false
-// 	log.Printf("UNLOCKED")
-// 	game.Pattern = make([]ButtonClick, 0)
-// 	game.PlayerTurn = make([]ButtonClick, 0)
-// 	game.PlayerClicksLeft = 0
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]interface{}{
-// 		"status": "success",
-// 		"isLocked": game.IsLocked,
-// 		"playerClicksLeft": game.PlayerClicksLeft,
-// 	})
-// }
-
-// func getPattern(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodGet {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	game.mu.RLock()
-// 	defer game.mu.RUnlock()
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]interface{}{
-// 		"pattern": game.Pattern,
-// 		"score":   game.Score,
-// 		"playerClicksLeft": game.PlayerClicksLeft,
-// 		"isLocked": game.IsLocked,
-// 	})
-// }
 
 func handleReset(w http.ResponseWriter, r *http.Request) {
 

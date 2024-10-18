@@ -51,12 +51,6 @@
         width: 100%;
       }
 
-      /* @media screen and (max-width: 850px) {
-        .instrument-wrapper {
-          max-width: 250px;
-          align-content: center;
-        }
-      } */
     </style>
   </head>
   <body>
@@ -72,9 +66,6 @@
   </header>
     <div id="gameControls" class="gameControls">
       <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
-      <!-- <button id="unlockButton" onclick="unlockPattern()">
-        UnLock Pattern
-      </button> -->
       <button id="resetButton" onclick="resetGame()">Reset Game</button></br> 
       <div id="status">
         1. Create a pattern with color button (minimum 3 clicks)</br> 
@@ -91,25 +82,7 @@
     </div>
     <div id="instrument-wrapper" class="instrument-wrapper"></div>
     <audio id="audio" preload="auto"></audio>
-    <script src="js/color.js"></script>
-    <script>
-      // function checkOrientation() {
-      //   const instrumentWrapper = document.getElementById("instrument-wrapper");
-      //   if (window.innerWidth > window.innerHeight) {
-      //     instrumentWrapper.style.display = "flex";
-      //     instrumentWrapper.style.position = "fixed";
-      //     instrumentWrapper.style.justifyContent = "center";
-      //     instrumentWrapper.style.bottom = "0";
-      //     instrumentWrapper.style.padding = "10px";
-      //     instrumentWrapper.style.width = "100%";
-      //   } else {
-      //     instrumentWrapper.style.display = "none";
-      //     alert("Flip the phone to play!");
-      //   }
-      // }
-      // checkOrientation();
+    <script src="js/player.js"></script>
 
-      // window.addEventListener("resize", checkOrientation);
-    </script>
   </body>
 </html>

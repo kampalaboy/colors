@@ -1,3 +1,5 @@
+// Data for the game
+
 const backgrounds = [
   { id: 0, color: "black", note: "./public/snare.wav", key: " " },
   { id: 1, color: "red", note: "./public/C.mp3", key: "a" },
@@ -9,6 +11,8 @@ const backgrounds = [
   { id: 7, color: "violet", note: "./public/B.mp3", key: "j" },
 ];
 
+// Controls for the game
+
 const button = document.getElementById("color");
 const audioElement = document.getElementById("audio");
 const instrument = document.getElementById("instrument-wrapper");
@@ -17,7 +21,6 @@ button.addEventListener("click", async () => {
   const chooseColor = Math.floor(Math.random() * backgrounds.length);
   const randomBackground = backgrounds[chooseColor];
 
-  console.log(chooseColor);
   document.body.style.backgroundColor = randomBackground.color;
 
   if (randomBackground.note) {
@@ -26,7 +29,7 @@ button.addEventListener("click", async () => {
       audioElement.play();
       await sendClickData(randomBackground, false);
     } catch (error) {
-      console.log(error);
+      alert(error);
     }
   } else {
     audioElement.pause();
@@ -49,20 +52,15 @@ function playInstrument() {
         instrumentButton.style.backgroundColor = b.color;
         try {
           if (currentAudio) {
-            try {
-              audioElement.pause();
-              audioElement.currentTime = 0;
-              await currentAudio;
-            } catch (error) {
-              alert("Woah...You are typing too fast!!, Refresh the page.");
-            }
+            audioElement.pause();
+            audioElement.currentTime = 0;
+            await currentAudio;
           }
           audioElement.src = b.note;
           currentAudio = audioElement.play();
           await currentAudio;
         } catch (error) {
-          console.log(error);
-          alert(error);
+          alert("Woah...You are typing too fast!!, Refresh the page.");
         }
         await sendClickData(buttonData, true);
       } else {
@@ -133,14 +131,13 @@ const sendClickData = async (buttonData, fromPlayer) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    // updateScore(result.score);
-    // updatePlayerClicksLeft(result.playerClicksLeft);
+
     isLocked = false;
     updateGameState(result.score, result.playerClicksLeft, isLocked);
 
     return result;
   } catch (error) {
-    console.error("Error sending click data:", error);
+    alert("Error sending click data:", error);
   }
 };
 
@@ -159,7 +156,6 @@ async function lockPattern() {
     updateGameState(result.score, result.playerClicksLeft, isLocked);
     return result;
   } catch (error) {
-    console.error("Error locking pattern:", error);
     alert("Must be minimum 3 random");
   }
 }
@@ -179,9 +175,11 @@ async function unlockPattern() {
     updateGameState();
     return result;
   } catch (error) {
-    console.error("Error locking pattern:", error);
+    alert("Error locking pattern:", error);
   }
 }
+
+// Resetters for the game
 
 async function resetGame() {
   try {
@@ -197,16 +195,14 @@ async function resetGame() {
     document.body.style.backgroundColor = "";
 
     const result = await response.json();
-    // updateScore(result.score);
-    // updatePlayerClicksLeft(result.playerClicksLeft);
+
     updateGameState(result.score, result.playerClicksLeft, isLocked);
   } catch (error) {
-    console.error("Error resetting game:", error);
+    alert("Error resetting game:", error);
   }
 }
 
 function updateScore(newScore) {
-  //score = newScore;
   const scoreElement = document.getElementById("score");
   if (scoreElement) {
     scoreElement.textContent = `Score: ${newScore}`;
@@ -214,7 +210,6 @@ function updateScore(newScore) {
 }
 
 function updatePlayerClicksLeft(newClicks) {
-  //clicks = newClicks;
   const clicksElement = document.getElementById("clicks");
   if (clicksElement) {
     clicksElement.textContent = `Clicks: ${newClicks}`;
@@ -224,6 +219,7 @@ function updatePlayerClicksLeft(newClicks) {
 window.onload = function () {
   updateScore(0);
   updatePlayerClicksLeft(0);
+  resetGame();
 };
 
 function updateGameState(s, c, l) {
