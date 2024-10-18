@@ -5,6 +5,16 @@ import (
 	"net/http"
 	"sync"
 )
+type Account struct{
+	id int 
+	userName string
+}
+
+type Gamer struct{
+	id int 
+	userName string
+	topScore int64
+}
 
 type ButtonClick struct {
 	Color string `json:"color"`
@@ -50,7 +60,7 @@ func GetPattern(w http.ResponseWriter, r *http.Request) {
 }
 
 func Authentication(){
-
+	
 }
 
 func TopScorers (){

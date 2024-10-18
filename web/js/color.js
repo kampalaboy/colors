@@ -133,11 +133,11 @@ const sendClickData = async (buttonData, fromPlayer) => {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const result = await response.json();
-    updateScore(result.score);
-    updatePlayerClicksLeft(result.playerClicksLeft);
-
+    // updateScore(result.score);
+    // updatePlayerClicksLeft(result.playerClicksLeft);
     isLocked = false;
-    updateGameState();
+    updateGameState(result.score, result.playerClicksLeft, isLocked);
+
     return result;
   } catch (error) {
     console.error("Error sending click data:", error);
@@ -156,7 +156,7 @@ async function lockPattern() {
 
     const result = await response.json();
     isLocked = true;
-    updateGameState();
+    updateGameState(result.score, result.playerClicksLeft, isLocked);
     return result;
   } catch (error) {
     console.error("Error locking pattern:", error);
@@ -195,34 +195,42 @@ async function resetGame() {
 
     isLocked = false;
     document.body.style.backgroundColor = "";
-    updateGameState();
+
     const result = await response.json();
-    updateScore(result.score);
-    updatePlayerClicksLeft(result.playerClicksLeft);
+    // updateScore(result.score);
+    // updatePlayerClicksLeft(result.playerClicksLeft);
+    updateGameState(result.score, result.playerClicksLeft, isLocked);
   } catch (error) {
     console.error("Error resetting game:", error);
   }
 }
 
-function updateScore(score) {
+function updateScore(newScore) {
+  //score = newScore;
   const scoreElement = document.getElementById("score");
   if (scoreElement) {
-    scoreElement.textContent = `Score: ${score}`;
+    scoreElement.textContent = `Score: ${newScore}`;
   }
 }
 
-function updatePlayerClicksLeft(clicks) {
+function updatePlayerClicksLeft(newClicks) {
+  //clicks = newClicks;
   const clicksElement = document.getElementById("clicks");
   if (clicksElement) {
-    clicksElement.textContent = `Clicks: ${clicks}`;
+    clicksElement.textContent = `Clicks: ${newClicks}`;
   }
 }
 
-function updateGameState() {
+window.onload = function () {
+  updateScore(0);
+  updatePlayerClicksLeft(0);
+};
+
+function updateGameState(s, c, l) {
   const lockButton = document.getElementById("lockButton");
   const statusText = document.getElementById("status");
 
-  if (isLocked) {
+  if (l) {
     lockButton.disabled = true;
     statusText.textContent = "Match the pattern!";
     document.body.style.backgroundColor = "";
@@ -233,6 +241,8 @@ function updateGameState() {
                         2. Lock the pattern </br>
                         3. Play the pattern on the piano for points </br></br>
     Make pattern as long as you like.  Longer pattern matching means more points!!`;
+    updateScore(s);
+    updatePlayerClicksLeft(c);
   }
 }
 
