@@ -20,6 +20,7 @@ type GameState struct {
 	PlayerTurn []ButtonClick `json:"playerTurn"` // Player's attempts
 	IsLocked   bool         `json:"isLocked"`    // Whether pattern is locked
 	Score      int          `json:"score"`       // Player's score
+	PlayerClicksLeft   int `json:"playerClicksLeft"` 
 	mu         sync.RWMutex
 }
 
@@ -28,6 +29,7 @@ var game = GameState{
 	PlayerTurn: make([]ButtonClick, 0),
 	IsLocked:   false,
 	Score:      0,
+	PlayerClicksLeft: 0,
 }
 
 func main() {
@@ -61,16 +63,20 @@ func handleClick(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Print(click.FromPlayer);
-
 	game.mu.Lock()
 	defer game.mu.Unlock()
 	if !click.FromPlayer {
 		// This adds to the pattern if not the player's turn and game isn't locked
 		game.Pattern = append(game.Pattern, click)
+		game.PlayerClicksLeft ++
+		log.Print(game.PlayerClicksLeft)
 		log.Printf("Added to pattern - Color: %s, Id: %d", click.Color, click.Id)
 	} else {
 		// Now it's the player's turn
+		
 		game.PlayerTurn = append(game.PlayerTurn, click)
+		game.PlayerClicksLeft--
+		log.Print(game.PlayerClicksLeft)
 		log.Printf("Added to playerTurn - Color: %s, Id: %d", click.Color, click.Id)
 	
 		// Validate the player's sequence only after all inputs are in
@@ -91,18 +97,22 @@ func handleClick(w http.ResponseWriter, r *http.Request) {
 			if matches && len(game.Pattern) >= 3 {
 				game.Score++
 				log.Printf("Pattern matched! Score incremented to: %d", game.Score)
-			} else {
-				log.Println("Pattern mismatch or too short.")
 			}
+			// if (game.PlayerClicksLeft==0){
+			// 	game.IsLocked = false
+			// }
+			game.Pattern = make([]ButtonClick, 0)
+			game.PlayerTurn = make([]ButtonClick, 0)
+			game.IsLocked = false
 		}
 	}
 	
-
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status":   "success",
 		"score":    game.Score,
 		"isLocked": game.IsLocked,
+		"playerClicksLeft": game.PlayerClicksLeft,
 	})
 }
 
@@ -128,7 +138,10 @@ func handleLock(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status": "success",
+		"isLocked": game.IsLocked,
+		"score": game.Score,
 		"pattern": game.Pattern,
+
 	})
 }
 
@@ -146,11 +159,13 @@ func handleUnlock(w http.ResponseWriter, r *http.Request) {
 	log.Printf("UNLOCKED")
 	game.Pattern = make([]ButtonClick, 0)
 	game.PlayerTurn = make([]ButtonClick, 0)
+	game.PlayerClicksLeft = 0
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status": "success",
 		"isLocked": game.IsLocked,
+		"playerClicksLeft": game.PlayerClicksLeft,
 	})
 }
 
@@ -167,6 +182,7 @@ func getPattern(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"pattern": game.Pattern,
 		"score":   game.Score,
+		"playerClicksLeft": game.PlayerClicksLeft,
 		"isLocked": game.IsLocked,
 	})
 }
@@ -182,11 +198,14 @@ func handleReset(w http.ResponseWriter, r *http.Request) {
 	game.PlayerTurn = make([]ButtonClick, 0)
 	game.IsLocked = false
 	game.Score = 0
+	game.PlayerClicksLeft = 0
 	game.mu.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status": "success",
 		"score": game.Score,
+		"playerClicksLeft": game.PlayerClicksLeft,
+
 	})
 }

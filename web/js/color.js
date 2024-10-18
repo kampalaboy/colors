@@ -82,7 +82,6 @@ function playInstrument() {
     window.addEventListener("keydown", (event) => {
       console.log(event);
       if (event.key === b.key && !event.repeat) {
-        //sendClickData(b, true);
         player(b);
       }
     });
@@ -134,6 +133,10 @@ const sendClickData = async (buttonData, fromPlayer) => {
     }
     const result = await response.json();
     updateScore(result.score);
+    updatePlayerClicksLeft(result.playerClicksLeft);
+
+    isLocked = false;
+    updateGameState();
     return result;
   } catch (error) {
     console.error("Error sending click data:", error);
@@ -194,6 +197,7 @@ async function resetGame() {
     updateGameState();
     const result = await response.json();
     updateScore(result.score);
+    updatePlayerClicksLeft(result.playerClicksLeft);
   } catch (error) {
     console.error("Error resetting game:", error);
   }
@@ -203,6 +207,13 @@ function updateScore(score) {
   const scoreElement = document.getElementById("score");
   if (scoreElement) {
     scoreElement.textContent = `Score: ${score}`;
+  }
+}
+
+function updatePlayerClicksLeft(clicks) {
+  const clicksElement = document.getElementById("clicks");
+  if (clicksElement) {
+    clicksElement.textContent = `Clicks: ${clicks}`;
   }
 }
 
@@ -216,7 +227,10 @@ function updateGameState() {
     document.body.style.backgroundColor = "";
   } else {
     lockButton.disabled = false;
-    statusText.textContent = "Create a pattern (minimum 3 clicks)";
+    statusText.innerHTML = `1. Create a pattern with color button (minimum 3 clicks)</br>
+                        2. Lock the pattern </br>
+                        3. Play the pattern on the piano for points </br></br>
+    Make pattern as long as you like.  Longer pattern matching means more points!!`;
   }
 }
 
