@@ -63,20 +63,18 @@ function playInstrument() {
         } catch (error) {
           console.log(error);
         }
-        await sendClickData(buttonData);
+        await sendClickData(buttonData, true);
       } else {
         audioElement.pause();
         audioElement.currentTime = 0;
       }
     };
     instrumentButton.addEventListener("mousedown", () => {
-      sendClickData(b, true);
       player(b);
     });
     instrumentButton.addEventListener(
       "touchstart",
       () => {
-        sendClickData(b, true);
         player(b);
       },
       { passive: false }
@@ -84,7 +82,7 @@ function playInstrument() {
     window.addEventListener("keydown", (event) => {
       console.log(event);
       if (event.key === b.key && !event.repeat) {
-        sendClickData(b, true);
+        //sendClickData(b, true);
         player(b);
       }
     });
@@ -136,6 +134,7 @@ const sendClickData = async (buttonData, fromPlayer) => {
     }
     const result = await response.json();
     updateScore(result.score);
+    updateGameState();
     return result;
   } catch (error) {
     console.error("Error sending click data:", error);
@@ -158,6 +157,26 @@ async function lockPattern() {
     return result;
   } catch (error) {
     console.error("Error locking pattern:", error);
+    alert("Must be minimum 3 random");
+  }
+}
+
+async function unlockPattern() {
+  try {
+    const response = await fetch("/api/unlock", {
+      method: "POST",
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    isLocked = false;
+    updateGameState();
+    return result;
+  } catch (error) {
+    console.error("Error locking pattern:", error);
   }
 }
 
@@ -174,7 +193,8 @@ async function resetGame() {
     isLocked = false;
     document.body.style.backgroundColor = "";
     updateGameState();
-    updateScore();
+    const result = await response.json();
+    updateScore(result.score);
   } catch (error) {
     console.error("Error resetting game:", error);
   }
@@ -184,9 +204,6 @@ function updateScore(score) {
   const scoreElement = document.getElementById("score");
   if (scoreElement) {
     scoreElement.textContent = `Score: ${score}`;
-    if (score === "undefined") {
-      return 0;
-    }
   }
 }
 

@@ -12,6 +12,10 @@
         animation: glow 3s infinite alternate;
       }
 
+      .gameControls {
+        padding: 25px;
+      }
+
       .button-wrapper {
         position: absolute;
         top: 50%;
@@ -44,14 +48,24 @@
         padding: 10px;
         width: 100%;
       }
+
+      @media screen and (max-width: 850px) {
+        .instrument-wrapper {
+          max-width: 250px;
+          align-content: center;
+        }
+      }
     </style>
   </head>
   <body>
-    <div id="gameControls">
+    <div id="gameControls" class="gameControls">
       <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
+      <button id="unlockButton" onclick="unlockPattern()">
+        UnLock Pattern
+      </button>
       <button id="resetButton" onclick="resetGame()">Reset Game</button>
       <div id="status">Create a pattern (minimum 3 clicks)</div>
-      <div id="score">Score: 0</div>
+      <div id="score">Score : 0</div>
     </div>
     <div class="button-wrapper">
       <button id="color">COLOR</button>
@@ -60,23 +74,23 @@
     <audio id="audio" preload="auto"></audio>
     <script src="js/color.js"></script>
     <script>
-      function checkOrientation() {
-        const instrumentWrapper = document.getElementById("instrument-wrapper");
-        if (window.innerWidth > window.innerHeight) {
-          instrumentWrapper.style.display = "flex";
-          instrumentWrapper.style.position = "fixed";
-          instrumentWrapper.style.justifyContent = "center";
-          instrumentWrapper.style.bottom = "0";
-          instrumentWrapper.style.padding = "10px";
-          instrumentWrapper.style.width = "100%";
-        } else {
-          instrumentWrapper.style.display = "none";
-          alert("Flip the phone to play!");
-        }
-      }
-      checkOrientation();
+      // function checkOrientation() {
+      //   const instrumentWrapper = document.getElementById("instrument-wrapper");
+      //   if (window.innerWidth > window.innerHeight) {
+      //     instrumentWrapper.style.display = "flex";
+      //     instrumentWrapper.style.position = "fixed";
+      //     instrumentWrapper.style.justifyContent = "center";
+      //     instrumentWrapper.style.bottom = "0";
+      //     instrumentWrapper.style.padding = "10px";
+      //     instrumentWrapper.style.width = "100%";
+      //   } else {
+      //     instrumentWrapper.style.display = "none";
+      //     alert("Flip the phone to play!");
+      //   }
+      // }
+      // checkOrientation();
 
-      window.addEventListener("resize", checkOrientation);
+      // window.addEventListener("resize", checkOrientation);
     </script>
   </body>
 </html>

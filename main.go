@@ -1,96 +1,3 @@
-// package main
-
-// import (
-// 	"encoding/json"
-// 	"log"
-// 	"net/http"
-// 	"sync"
-// )
-
-// // ButtonClick defines the structure for button click data
-// type ButtonClick struct {
-// 	Color string `json:"color"`
-// 	Note  string `json:"note"`
-// 	Key   string `json:"key"`
-// 	Id    int    `json:"id"`
-// }
-
-// // ColorHistory stores the history of clicks
-// type ColorHistory struct {
-// 	clicks []ButtonClick
-// 	mu     sync.RWMutex
-// }
-
-// var history = ColorHistory{
-// 	clicks: make([]ButtonClick, 0),
-// }
-
-// func main() {
-// 	// Handle static files
-// 	fs := http.FileServer(http.Dir("./web"))
-// 	http.Handle("/", fs)
-
-// 	// Handle button clicks
-// 	http.HandleFunc("/api/click", handleClick)
-
-// 	// Handle color history
-// 	http.HandleFunc("/api/colors", iterateColorList)
-
-// 	log.Println("Server starting on http://localhost:8080")
-// 	if err := http.ListenAndServe(":8080", nil); err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
-
-// func handleClick(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodPost {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	var click ButtonClick
-// 	if err := json.NewDecoder(r.Body).Decode(&click); err != nil {
-// 		http.Error(w, err.Error(), http.StatusBadRequest)
-// 		return
-// 	}
-
-// 	// Add click to history
-// 	history.mu.Lock()
-// 	click.Id = len(history.clicks)
-// 	history.clicks = append(history.clicks, click)
-// 	history.mu.Unlock()
-
-// 	// Log the click event
-// 	log.Printf("Button clicked - Color: %s, Note: %s, Key: %s, Id: %d",
-// 		click.Color, click.Note, click.Key, click.Id)
-
-// 	// Send response
-// 	w.WriteHeader(http.StatusOK)
-// 	json.NewEncoder(w).Encode(map[string]string{
-// 		"status": "success",
-// 	})
-// }
-
-// func iterateColorList(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodGet {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	// Get cursor from query parameter
-// 	cursor := r.URL.Query().Get("cursor")
-// 	if cursor == "" {
-// 		cursor = "0"
-// 	}
-
-// 	// Return all clicks after cursor
-// 	history.mu.RLock()
-// 	defer history.mu.RUnlock()
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(history.clicks)
-// }
-
 package main
 
 import (
@@ -129,11 +36,13 @@ func main() {
 
 	http.HandleFunc("/api/click", handleClick)
 	http.HandleFunc("/api/lock", handleLock)
+	http.HandleFunc("/api/unlock", handleUnlock)
 	http.HandleFunc("/api/pattern", getPattern)
 	http.HandleFunc("/api/reset", handleReset)
-
-	log.Println("Server starting on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", nil); err != nil {
+	
+	wifiIP := "192.168.0.109:8080" 
+	log.Printf("Server starting on http://%s",wifiIP)
+	if err := http.ListenAndServe(wifiIP, nil); err != nil {
 		log.Fatal(err)
 	}
 }
@@ -154,20 +63,17 @@ func handleClick(w http.ResponseWriter, r *http.Request) {
 
 	game.mu.Lock()
 	defer game.mu.Unlock()
-	if !click.FromPlayer && !game.IsLocked {
+	if !click.FromPlayer {
 		// This adds to the pattern if not the player's turn and game isn't locked
 		game.Pattern = append(game.Pattern, click)
 		log.Printf("Added to pattern - Color: %s, Id: %d", click.Color, click.Id)
-	} else if click.FromPlayer && game.IsLocked {
+	} else {
 		// Now it's the player's turn
 		game.PlayerTurn = append(game.PlayerTurn, click)
 		log.Printf("Added to playerTurn - Color: %s, Id: %d", click.Color, click.Id)
 	
 		// Validate the player's sequence only after all inputs are in
 		if len(game.PlayerTurn) == len(game.Pattern) {
-
-			game.IsLocked = false 
-
 			log.Println("Validating player's sequence...")
 			matches := true
 	
@@ -187,10 +93,6 @@ func handleClick(w http.ResponseWriter, r *http.Request) {
 			} else {
 				log.Println("Pattern mismatch or too short.")
 			}
-	
-			// Reset player turn for next round
-			 game.PlayerTurn = make([]ButtonClick, 0)
-			
 		}
 	}
 	
@@ -229,6 +131,28 @@ func handleLock(w http.ResponseWriter, r *http.Request) {
 	})
 }
 
+func handleUnlock(w http.ResponseWriter, r *http.Request) {
+	log.Printf("Unlocking...")
+	if r.Method != http.MethodPost {
+		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		return
+	}
+
+	game.mu.Lock()
+	defer game.mu.Unlock()
+
+	game.IsLocked = false
+	log.Printf("UNLOCKED")
+	game.Pattern = make([]ButtonClick, 0)
+	game.PlayerTurn = make([]ButtonClick, 0)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"status": "success",
+		"isLocked": game.IsLocked,
+	})
+}
+
 func getPattern(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
@@ -260,7 +184,8 @@ func handleReset(w http.ResponseWriter, r *http.Request) {
 	game.mu.Unlock()
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	json.NewEncoder(w).Encode(map[string]interface{}{
 		"status": "success",
+		"score": game.Score,
 	})
 }
