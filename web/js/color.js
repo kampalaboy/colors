@@ -134,7 +134,6 @@ const sendClickData = async (buttonData, fromPlayer) => {
     }
     const result = await response.json();
     updateScore(result.score);
-    updateGameState();
     return result;
   } catch (error) {
     console.error("Error sending click data:", error);
