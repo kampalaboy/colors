@@ -7,23 +7,6 @@ import (
 	"net/http"
 )
 
-// type ButtonClick struct {
-// 	Color string `json:"color"`
-// 	Note  string `json:"note"`
-// 	Key   string `json:"key"`
-// 	Id    int    `json:"id"`
-// 	FromPlayer bool `json:"fromPlayer"`
-// }
-
-// type GameState struct {
-// 	Pattern    []ButtonClick `json:"pattern"`    // Random clicks pattern
-// 	PlayerTurn []ButtonClick `json:"playerTurn"` // Player's attempts
-// 	IsLocked   bool         `json:"isLocked"`    // Whether pattern is locked
-// 	Score      int          `json:"score"`       // Player's score
-// 	PlayerClicksLeft   int `json:"playerClicksLeft"`
-// 	mu         sync.RWMutex
-// }
-
 
 func main() {
 	fs := http.FileServer(http.Dir("./web"))
