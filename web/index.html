@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>COLORS</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
     <style>
       body {
         margin: 0;
         height: 100vh;
         position: relative;
         animation: glow 3s infinite alternate;
+        color: teal;
       }
 
       .gameControls {
@@ -58,6 +60,16 @@
     </style>
   </head>
   <body>
+    <header style="text-align: center;">
+
+      <nav style="text-align:center; margin-top: 20px;">
+          <ul style="display: flex; justify-content:center; align-self:center;">
+              <li style="padding: 25px; margin: 5px;" ><a href="/">Color Game</a></li>
+              <li style="padding: 25px; margin: 5px;" ><a href="code.html">Code Game</a></li>
+              <li style="padding: 25px; margin: 5px;"><a href="multiplayer.html">Multiplayer</a></li>
+         </ul>
+      </nav>
+  </header>
     <div id="gameControls" class="gameControls">
       <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
       <!-- <button id="unlockButton" onclick="unlockPattern()">
@@ -71,8 +83,8 @@
 
         Make pattern as long as you like.  Longer pattern matching means more points!!
       </div></br> 
-      <div id="score">Score: 0</div>
-      <div id="clicks">Clicks: 0</div>
+      <div id="score" style="font-size: 50px;"></div>
+      <div id="clicks" style="font-size: 50px;"></div>
     </div>
     <div class="button-wrapper">
       <button id="color">COLOR</button>
