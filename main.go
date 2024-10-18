@@ -56,11 +56,14 @@ func handleClick(w http.ResponseWriter, r *http.Request) {
 		game.PlayerClicksLeft ++
 		log.Print(game.PlayerClicksLeft)
 		log.Printf("Added to pattern - Color: %s, Id: %d", click.Color, click.Id)
-	} else {
+	}
+	if click.FromPlayer && game.IsLocked {
 		// Now it's the player's turn
 		
 		game.PlayerTurn = append(game.PlayerTurn, click)
-		game.PlayerClicksLeft--
+		
+			game.PlayerClicksLeft--
+		
 		log.Print(game.PlayerClicksLeft)
 		log.Printf("Added to playerTurn - Color: %s, Id: %d", click.Color, click.Id)
 	

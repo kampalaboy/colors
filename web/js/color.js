@@ -228,6 +228,7 @@ function updateGameState() {
     document.body.style.backgroundColor = "";
   } else {
     lockButton.disabled = false;
+
     statusText.innerHTML = `1. Create a pattern with color button (minimum 3 clicks)</br>
                         2. Lock the pattern </br>
                         3. Play the pattern on the piano for points </br></br>
