@@ -12,13 +12,21 @@ func main() {
 	fs := http.FileServer(http.Dir("./web"))
 	http.Handle("/", fs)
 
+	http.HandleFunc("/code", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/code.html")
+	})
+	http.HandleFunc("/multiplayer", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/multiplayer.html")
+	})
+	
 	http.HandleFunc("/api/click", handleClick)
 	http.HandleFunc("/api/lock", handleLock)
 	http.HandleFunc("/api/pattern", server.GetPattern)
 	http.HandleFunc("/api/reset", handleReset)
 	
 	//wifiIP := "192.168.43.54:8080"
-	wifiIP := "192.168.0.109:8080" 
+	//wifiIP := "192.168.0.109:8080"
+	wifiIP :="localhost:8080" 
 	log.Printf("Server starting on http://%s",wifiIP)
 	if err := http.ListenAndServe(wifiIP, nil); err != nil {
 		log.Fatal(err)

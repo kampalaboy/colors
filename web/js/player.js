@@ -38,7 +38,6 @@ button.addEventListener("click", async () => {
 });
 
 function playInstrument() {
-  let isTouch = false;
   let currentAudio = null;
 
   backgrounds.forEach((b, index) => {
@@ -50,18 +49,15 @@ function playInstrument() {
     const player = async (buttonData) => {
       if (b.note) {
         instrumentButton.style.backgroundColor = b.color;
-        try {
-          if (currentAudio) {
-            audioElement.pause();
-            audioElement.currentTime = 0;
-            await currentAudio;
-          }
-          audioElement.src = b.note;
-          currentAudio = audioElement.play();
+
+        if (currentAudio) {
+          audioElement.pause();
+          audioElement.currentTime = 0;
           await currentAudio;
-        } catch (error) {
-          alert("Woah...You are typing too fast!!, Refresh the page.");
         }
+        audioElement.src = b.note;
+        currentAudio = audioElement.play();
+        await currentAudio;
         await sendClickData(buttonData, true);
       } else {
         audioElement.pause();
