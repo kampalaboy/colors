@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>COLORS</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+    <style>
+      body {
+        margin: 0;
+        height: 100vh;
+        position: relative;
+        animation: glow 3s infinite alternate;
+        color: teal;
+      }
+
+      .gameControls {
+        padding: 25px;
+      }
+
+      .button-wrapper {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: fit-content;
+        height: fit-content;
+        padding-bottom: 25px;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 0;
+        border: 2px solid #333;
+        border-radius: 4px;
+        background-color: #fff;
+      }
+
+      button:hover {
+        background-color: #f0f0f0;
+      }
+
+      .instrument-wrapper {
+        display: flex;
+        position: fixed;
+        justify-content: center;
+        bottom: 0;
+        padding: 10px;
+        width: 100%;
+      }
+
+      /* @media screen and (max-width: 850px) {
+        .instrument-wrapper {
+          max-width: 250px;
+          align-content: center;
+        }
+      } */
+    </style>
+  </head>
+  <body>
+    <header style="text-align: center;">
+
+      <nav style="text-align:center; margin-top: 20px;">
+          <ul style="display: flex; justify-content:center; align-self:center;">
+              <li style="padding: 25px; margin: 5px;" ><a href="/">Color Game</a></li>
+              <li style="padding: 25px; margin: 5px;" ><a href="code.html">Code Game</a></li>
+              <li style="padding: 25px; margin: 5px;"><a href="multiplayer.html">Multiplayer</a></li>
+         </ul>
+      </nav>
+  </header>
+    <div id="gameControls" class="gameControls">
+      <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
+      <!-- <button id="unlockButton" onclick="unlockPattern()">
+        UnLock Pattern
+      </button> -->
+      <button id="resetButton" onclick="resetGame()">Reset Game</button></br> 
+      <div id="status">
+        1. Create a pattern with color button (minimum 3 clicks)</br> 
+        2. Lock the pattern </br> 
+        3. Play the pattern on the piano for points </br> </br> 
+
+        Make pattern as long as you like.  Longer pattern matching means more points!!
+      </div></br> 
+      <div id="score" style="font-size: 50px;"></div>
+      <div id="clicks" style="font-size: 50px;"></div>
+    </div>
+    <div class="button-wrapper">
+      <button id="color">COLOR</button>
+    </div>
+    <div id="instrument-wrapper" class="instrument-wrapper"></div>
+    <audio id="audio" preload="auto"></audio>
+    <script src="js/multiplayer.js"></script>
+    <script>
+      // function checkOrientation() {
+      //   const instrumentWrapper = document.getElementById("instrument-wrapper");
+      //   if (window.innerWidth > window.innerHeight) {
+      //     instrumentWrapper.style.display = "flex";
+      //     instrumentWrapper.style.position = "fixed";
+      //     instrumentWrapper.style.justifyContent = "center";
+      //     instrumentWrapper.style.bottom = "0";
+      //     instrumentWrapper.style.padding = "10px";
+      //     instrumentWrapper.style.width = "100%";
+      //   } else {
+      //     instrumentWrapper.style.display = "none";
+      //     alert("Flip the phone to play!");
+      //   }
+      // }
+      // checkOrientation();
+
+      // window.addEventListener("resize", checkOrientation);
+    </script>
+  </body>
+</html>

@@ -9,30 +9,7 @@
 //   { id: 7, color: "violet", note: "./public/B.mp3", key: "j" },
 // ];
 
-// const button = document.getElementById("color");
-// const audioElement = document.getElementById("audio");
 // const instrument = document.getElementById("instrument-wrapper");
-
-// button.addEventListener("click", async () => {
-//   const chooseColor = Math.floor(Math.random() * backgrounds.length);
-//   const randomBackground = backgrounds[chooseColor];
-
-//   console.log(chooseColor);
-//   document.body.style.backgroundColor = randomBackground.color;
-
-//   if (randomBackground.note) {
-//     try {
-//       audioElement.src = randomBackground.note;
-//       audioElement.play();
-//       await sendClickData(randomBackground, false);
-//     } catch (error) {
-//       console.log(error);
-//     }
-//   } else {
-//     audioElement.pause();
-//     audioElement.currentTime = 0;
-//   }
-// });
 
 // function playInstrument() {
 //   let isTouch = false;
@@ -261,13 +238,46 @@ const backgrounds = [
 ];
 
 // Cached DOM Elements
-const button = document.getElementById("color");
+const randomColorButton = document.getElementById("color");
 const audioElement = document.getElementById("audio");
 const instrument = document.getElementById("instrument-wrapper");
 const scoreElement = document.getElementById("score");
 const clicksElement = document.getElementById("clicks");
 const lockButton = document.getElementById("lockButton");
 const statusText = document.getElementById("status");
+
+const socket = new WebSocket("ws://localhost:8080/ws");
+
+socket.onmessage = function (event) {
+  const data = JSON.parse(event.data);
+  if (data.action === "update") {
+    // Update the game UI based on received game state
+    console.log("Updated game state:", data);
+  }
+};
+
+// Send a click event
+function sendClick(clickData, fromPlayer) {
+  socket.send(
+    JSON.stringify({
+      action: "click",
+      buttonClick: clickData,
+      fromPlayer: fromPlayer,
+    })
+  );
+}
+
+// Send a lock event
+function lockGame() {
+  socket.send(JSON.stringify({ action: "lock" }));
+}
+
+// Send a reset event
+function resetGame() {
+  socket.send(JSON.stringify({ action: "reset" }));
+  updateGameState(result.score, result.playerClicksLeft, false);
+  document.body.style.backgroundColor = "";
+}
 
 // Update Functions
 function updateScore(newScore) {
@@ -282,13 +292,13 @@ function updatePlayerClicksLeft(newClicks) {
   }
 }
 
-function showError(message) {
-  // You can replace this with your preferred error handling UI
-  console.error(message);
-  alert(message);
-}
+// function showError(message) {
+//   // You can replace this with your preferred error handling UI
+//   console.error(message);
+//   alert(message);
+// }
 
-// Game State Update
+// // Game State Update
 function updateGameState(s, c, l) {
   lockButton.disabled = l;
   statusText.innerHTML = l
@@ -302,48 +312,71 @@ function updateGameState(s, c, l) {
   updatePlayerClicksLeft(c);
 }
 
-// Game Actions
-const sendClickData = async (buttonData, fromPlayer) => {
-  try {
-    const response = await fetch("/api/click", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: buttonData.id,
-        color: buttonData.color,
-        note: buttonData.note,
-        key: buttonData.key,
-        fromPlayer: fromPlayer,
-      }),
-    });
+// // Game Actions
+// const sendClickData = async (buttonData, fromPlayer) => {
+//   try {
+//     const response = await fetch("/api/click", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         id: buttonData.id,
+//         color: buttonData.color,
+//         note: buttonData.note,
+//         key: buttonData.key,
+//         fromPlayer: fromPlayer,
+//       }),
+//     });
 
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+//     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
-    const result = await response.json();
-    updateGameState(result.score, result.playerClicksLeft, false); // Pass false for isLocked
+//     const result = await response.json();
+//     updateGameState(result.score, result.playerClicksLeft, false); // Pass false for isLocked
 
-    return result;
-  } catch (error) {
-    showError("Error sending click data: " + error);
+//     return result;
+//   } catch (error) {
+//     showError("Error sending click data: " + error);
+//   }
+// };
+
+// // Initialize Game
+// async function resetGame() {
+//   try {
+//     const response = await fetch("/api/reset", { method: "POST" });
+
+//     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+//     const result = await response.json();
+//     updateGameState(result.score, result.playerClicksLeft, false);
+//     document.body.style.backgroundColor = "";
+//   } catch (error) {
+//     showError("Error resetting game: " + error);
+//   }
+// }
+
+//Random Color Picker
+
+randomColorButton.addEventListener("click", async () => {
+  const chooseColor = Math.floor(Math.random() * backgrounds.length);
+  const randomBackground = backgrounds[chooseColor];
+
+  console.log(chooseColor);
+  document.body.style.backgroundColor = randomBackground.color;
+
+  if (randomBackground.note) {
+    try {
+      audioElement.src = randomBackground.note;
+      audioElement.play();
+      sendClick(randomBackground, false);
+    } catch (error) {
+      console.log(error);
+    }
+  } else {
+    audioElement.pause();
+    audioElement.currentTime = 0;
   }
-};
-
-// Initialize Game
-async function resetGame() {
-  try {
-    const response = await fetch("/api/reset", { method: "POST" });
-
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-    const result = await response.json();
-    updateGameState(result.score, result.playerClicksLeft, false);
-    document.body.style.backgroundColor = "";
-  } catch (error) {
-    showError("Error resetting game: " + error);
-  }
-}
+});
 
 // Setup Instrument Buttons
 function playInstrument() {
@@ -372,7 +405,7 @@ function playInstrument() {
 
         try {
           audioElement.play(); // Only play after user interaction
-          await sendClickData(buttonData, true);
+          sendClick(buttonData, true);
         } catch (error) {
           console.error("Error playing audio:", error);
           alert("Playback failed: " + error.message);
@@ -436,6 +469,6 @@ let userHasInteracted = false; // Flag to track user interaction
 window.onload = function () {
   updateScore(0);
   updatePlayerClicksLeft(0);
-  resetGame();
 };
 playInstrument();
+resetGame();
