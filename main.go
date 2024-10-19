@@ -19,7 +19,8 @@ func main() {
 	http.HandleFunc("/api/reset", handleReset)
 	
 	//wifiIP := "192.168.43.54:8080"
-	wifiIP := "192.168.0.109:8080" 
+	// wifiIP := "192.168.0.109:8080" 
+	wifiIP :="localhost:8080"
 	log.Printf("Server starting on http://%s",wifiIP)
 	if err := http.ListenAndServe(wifiIP, nil); err != nil {
 		log.Fatal(err)
