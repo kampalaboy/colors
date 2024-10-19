@@ -19,6 +19,7 @@ var upgrader = websocket.Upgrader{
 var clients = make(map[*websocket.Conn]bool) // Keep track of connected clients
 var broadcast = make(chan Message)           // Channel for broadcasting messages to clients
 var mu sync.Mutex                            // Mutex for thread-safe access to game state
+var isSocket = false
 
 type Message struct {
 	Action           string            `json:"action"`
@@ -41,6 +42,13 @@ func main() {
 	fs := http.FileServer(http.Dir("./web"))
 	http.Handle("/", fs)
 
+	http.HandleFunc("/code", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/code.html")
+	})
+	http.HandleFunc("/multiplayer", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/multiplayer.html")
+	})
+
 	http.HandleFunc("/api/click", handleClick)
  	http.HandleFunc("/api/lock", handleLock)
 	// http.HandleFunc("/api/unlock", handleUnlock)
@@ -62,6 +70,8 @@ func main() {
 
 // Handle WebSocket connections
 func handleConnections(w http.ResponseWriter, r *http.Request) {
+	
+	isSocket = true
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
