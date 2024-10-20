@@ -3,6 +3,7 @@ package main
 import (
 	"colors/server"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
@@ -19,7 +20,6 @@ var upgrader = websocket.Upgrader{
 var clients = make(map[*websocket.Conn]bool) // Keep track of connected clients
 var broadcast = make(chan Message)           // Channel for broadcasting messages to clients
 var mu sync.Mutex                            // Mutex for thread-safe access to game state
-var isSocket = false
 
 type Message struct {
 	Action           string            `json:"action"`
@@ -71,7 +71,6 @@ func main() {
 // Handle WebSocket connections
 func handleConnections(w http.ResponseWriter, r *http.Request) {
 	
-	isSocket = true
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -107,6 +106,8 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			PlayerClicksLeft: game.PlayerClicksLeft,
 			Pattern:          game.Pattern,
 		}
+
+		fmt.Print(msg);
 	}
 }
 
@@ -194,36 +195,6 @@ func calculateScore(patternLength int) int {
 	}
 	return score
 }
-
-
-// package main
-
-// import (
-// 	"colors/server"
-// 	"encoding/json"
-// 	"log"
-// 	"net/http"
-// )
-
-
-// func main() {
-// 	fs := http.FileServer(http.Dir("./web"))
-// 	http.Handle("/", fs)
-
-// 	http.HandleFunc("/api/click", handleClick)
-// 	http.HandleFunc("/api/lock", handleLock)
-// 	// http.HandleFunc("/api/unlock", handleUnlock)
-// 	http.HandleFunc("/api/pattern", server.GetPattern)
-// 	http.HandleFunc("/api/reset", handleReset)
-	
-// 	//wifiIP := "192.168.43.54:8080"
-// 	// wifiIP := "192.168.0.109:8080" 
-// 	wifiIP :="localhost:8080"
-// 	log.Printf("Server starting on http://%s",wifiIP)
-// 	if err := http.ListenAndServe(wifiIP, nil); err != nil {
-// 		log.Fatal(err)
-// 	}
-// }
 
 
 func handleClick(w http.ResponseWriter, r *http.Request) {
@@ -358,24 +329,6 @@ func handleLock(w http.ResponseWriter, r *http.Request) {
 // 		"status": "success",
 // 		"isLocked": game.IsLocked,
 // 		"playerClicksLeft": game.PlayerClicksLeft,
-// 	})
-// }
-
-// func getPattern(w http.ResponseWriter, r *http.Request) {
-// 	if r.Method != http.MethodGet {
-// 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-// 		return
-// 	}
-
-// 	game.mu.RLock()
-// 	defer game.mu.RUnlock()
-
-// 	w.Header().Set("Content-Type", "application/json")
-// 	json.NewEncoder(w).Encode(map[string]interface{}{
-// 		"pattern": game.Pattern,
-// 		"score":   game.Score,
-// 		"playerClicksLeft": game.PlayerClicksLeft,
-// 		"isLocked": game.IsLocked,
 // 	})
 // }
 

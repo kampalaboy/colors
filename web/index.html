@@ -1,38 +1,70 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>COLORS</title>
-    <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <style>
       body {
         margin: 0;
-        height: 100vh;
-        position: relative;
-        animation: glow 3s infinite alternate;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         color: teal;
+        padding: 20px;
+        box-sizing: border-box;
       }
 
-      .gameControls {
-        padding: 25px;
+      header {
+        width: 100%;
+        margin-bottom: 20px;
       }
 
-      .button-wrapper {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: fit-content;
-        height: fit-content;
-        padding-bottom: 25px;
+      nav ul {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
       }
+
+      nav ul li {
+        padding: 15px;
+        margin: 5px;
+      }
+
+      nav ul li a {
+        text-decoration: none;
+        color: #000;
+        font-size: 18px;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .game-container {
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+      }
+
+      /* .control-buttons {
+        margin: 1px 0;
+      } */
 
       button {
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;
-        margin: 0;
+        margin: 5px;
         border: 2px solid #333;
         border-radius: 4px;
         background-color: #fff;
@@ -42,58 +74,137 @@
         background-color: #f0f0f0;
       }
 
-      .instrument-wrapper {
-        display: flex;
-        position: fixed;
-        justify-content: center;
-        bottom: 0;
-        padding: 10px;
-        width: 100%;
+      #status {
+        text-align: center;
+        margin: 20px 0;
+        line-height: 1.5;
       }
 
-      /* @media screen and (max-width: 850px) {
-        .instrument-wrapper {
-          max-width: 250px;
-          align-content: center;
-        }
-      } */
-    </style>
+      #score,
+      #clicks {
+        font-size: 50px;
+        text-align: center;
+        margin: 10px 10px;
+      }
 
+      .button-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        /* margin: 1px 0; */
+      }
+
+      .instrument-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+        /* margin-top: auto; */
+        position: relative;
+        bottom: 0;
+      }
+
+      .instrument-button {
+        height: 150px;
+        margin: 3px;
+        border: solid black 10px;
+      }
+
+      @media (max-width: 768px) {
+        .instrument-button {
+          height: 150px;
+          width: 5px;
+          margin: 2px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .instrument-button {
+          height: 150px;
+          width: 10px;
+          margin: 2px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        nav ul {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        nav ul li {
+          padding: 10px;
+        }
+
+        button {
+          width: 100%;
+          max-width: 300px;
+          margin: 5px 0;
+        }
+
+        #score,
+        #clicks {
+          font-size: 36px;
+        }
+
+        .instrument-wrapper {
+          width: calc(100% - 20px);
+          padding: 10px;
+          margin: 0 10px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Optional: Add smooth scrolling for touch devices */
+        .instrument-wrapper::-webkit-scrollbar {
+          height: 4px;
+        }
+
+        .instrument-wrapper::-webkit-scrollbar-thumb {
+          border-radius: 2px;
+        }
+      }
+    </style>
   </head>
   <body>
-
-    <header style="text-align: center;">
-
-      <nav style="text-align:center; margin-top: 20px;">
-          <ul style="display: flex; justify-content:center; align-self:center;">
-              <li style="padding: 25px; margin: 5px;" ><a href="/">Color Game</a></li>
-              <li style="padding: 25px; margin: 5px;" ><a href="code">Code Game</a></li>
-              <li style="padding: 25px; margin: 5px;"><a href="multiplayer">Multiplayer</a></li>
-         </ul>
+    <header>
+      <nav>
+        <ul>
+          <li><a href="/">Color Game</a></li>
+          <li><a href="code">Code Game</a></li>
+          <li><a href="multiplayer">Multiplayer</a></li>
+        </ul>
       </nav>
-  </header>
-    <div id="gameControls" class="gameControls">
-      <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
-      <!-- <button id="unlockButton" onclick="unlockPattern()">
-        UnLock Pattern
-      </button> -->
-      <button id="resetButton" onclick="resetGame()">Reset Game</button></br> 
-      <div id="status">
-        1. Create a pattern with color button (minimum 3 clicks)</br> 
-        2. Lock the pattern </br> 
-        3. Play the pattern on the piano for points </br> </br> 
+    </header>
 
-        Make pattern as long as you like.  Longer pattern matching means more points!!
-      </div></br> 
-      <div id="score" style="font-size: 50px;"></div>
-      <div id="clicks" style="font-size: 50px;"></div>
+    <div class="game-container">
+      <h1>THE Easiest Game</h1>
+
+      <div id="status">
+        1. Create a pattern with color button (minimum 3 clicks)<br />
+        2. Lock the pattern<br />
+        3. Play the pattern on the piano for points<br /><br />
+        Make pattern as long as you like. Longer pattern matching means more
+        points!!
+      </div>
+      <div style="display: flex">
+        <div id="score"></div>
+        <div id="clicks"></div>
+      </div>
+
+      <div class="control-buttons">
+        <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
+        <button id="resetButton" onclick="resetGame()">Reset Game</button>
+      </div>
+
+      <div class="button-wrapper">
+        <button id="color">COLOR</button>
+      </div>
     </div>
-    <div class="button-wrapper">
-      <button id="color">COLOR</button>
-    </div>
+
     <div id="instrument-wrapper" class="instrument-wrapper"></div>
     <audio id="audio" preload="auto"></audio>
-   
+
     <script>
       // function checkOrientation() {
       //   const instrumentWrapper = document.getElementById("instrument-wrapper");
@@ -113,7 +224,6 @@
 
       // window.addEventListener("resize", checkOrientation);
     </script>
-        <script src="js/player.js"></script>
-
+    <script src="js/player.js"></script>
   </body>
 </html>

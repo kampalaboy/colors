@@ -13,55 +13,74 @@ const backgrounds = [
 
 // Controls for the game
 
-const button = document.getElementById("color");
+const randomColorbutton = document.getElementById("color");
 const audioElement = document.getElementById("audio");
 const instrument = document.getElementById("instrument-wrapper");
+const scoreElement = document.getElementById("score");
+const clicksElement = document.getElementById("clicks");
+const lockButton = document.getElementById("lockButton");
+const statusText = document.getElementById("status");
 
-button.addEventListener("click", async () => {
+randomColorbutton.addEventListener("click", async () => {
   const chooseColor = Math.floor(Math.random() * backgrounds.length);
   const randomBackground = backgrounds[chooseColor];
 
+  const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
+  pianoKeys.forEach((key) => {
+    key.style.backgroundColor = ""; // Reset color to default
+  });
+
+  const instrumentButton = document.getElementById(
+    `piano-key-${randomBackground.id}`
+  );
+
   document.body.style.backgroundColor = randomBackground.color;
+  instrumentButton.style.backgroundColor = randomBackground.color;
 
   if (randomBackground.note) {
-    try {
-      audioElement.src = randomBackground.note;
-      audioElement.play();
-      await sendClickData(randomBackground, false);
-    } catch (error) {
-      alert(error);
+    audioElement.src = randomBackground.note;
+
+    var currentAudio = audioElement.play();
+    if (currentAudio !== undefined) {
+      currentAudio
+        .then((_) => {
+          //audioElement.pause();
+        })
+        .catch((error) => {
+          console.log(error);
+        });
     }
-  } else {
-    audioElement.pause();
-    audioElement.currentTime = 0;
+
+    await sendClickData(randomBackground, false);
   }
 });
 
 function playInstrument() {
-  let currentAudio = null;
-
   backgrounds.forEach((b, index) => {
     const instrumentButton = document.createElement("button");
     instrument.appendChild(instrumentButton);
-    instrumentButton.style.margin = "3px";
-    instrumentButton.style.height = "150px";
+
+    instrumentButton.id = `piano-key-${b.id}`;
+    instrumentButton.classList.add("instrument-button");
 
     const player = async (buttonData) => {
       if (b.note) {
         instrumentButton.style.backgroundColor = b.color;
 
-        if (currentAudio) {
-          audioElement.pause();
-          audioElement.currentTime = 0;
-          await currentAudio;
-        }
         audioElement.src = b.note;
-        currentAudio = audioElement.play();
-        await currentAudio;
+        var currentAudio = audioElement.play();
+
+        if (currentAudio !== undefined) {
+          currentAudio
+            .then((_) => {
+              //audioElement.pause();
+            })
+            .catch((error) => {
+              console.log(error);
+            });
+        }
+        //await currentAudio;
         await sendClickData(buttonData, true);
-      } else {
-        audioElement.pause();
-        audioElement.currentTime = 0;
       }
     };
     instrumentButton.addEventListener("mousedown", () => {
@@ -82,14 +101,10 @@ function playInstrument() {
     });
     instrumentButton.addEventListener("mouseup", () => {
       instrumentButton.style.backgroundColor = "";
-      audioElement.pause();
-      audioElement.currentTime = 0;
     });
     window.addEventListener("keyup", (event) => {
       if (event.key === b.key) {
         instrumentButton.style.backgroundColor = "";
-        audioElement.pause();
-        audioElement.currentTime = 0;
       }
     });
     instrumentButton.addEventListener(
@@ -100,10 +115,6 @@ function playInstrument() {
       },
       { passive: false }
     );
-    document.addEventListener("touchcancel", () => {
-      audioElement.pause();
-      audioElement.currentTime = 0;
-    });
   });
 }
 
@@ -199,14 +210,12 @@ async function resetGame() {
 }
 
 function updateScore(newScore) {
-  const scoreElement = document.getElementById("score");
   if (scoreElement) {
     scoreElement.textContent = `Score: ${newScore}`;
   }
 }
 
 function updatePlayerClicksLeft(newClicks) {
-  const clicksElement = document.getElementById("clicks");
   if (clicksElement) {
     clicksElement.textContent = `Clicks: ${newClicks}`;
   }
@@ -219,13 +228,14 @@ window.onload = function () {
 };
 
 function updateGameState(s, c, l) {
-  const lockButton = document.getElementById("lockButton");
-  const statusText = document.getElementById("status");
-
   if (l) {
     lockButton.disabled = true;
     statusText.textContent = "Match the pattern!";
     document.body.style.backgroundColor = "";
+    const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
+    pianoKeys.forEach((key) => {
+      key.style.backgroundColor = ""; // Reset color to default
+    });
   } else {
     lockButton.disabled = false;
 

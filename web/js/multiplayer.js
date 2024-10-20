@@ -19,7 +19,12 @@ const clicksElement = document.getElementById("clicks");
 const lockButton = document.getElementById("lockButton");
 const statusText = document.getElementById("status");
 
-const socket = new WebSocket("ws://localhost:8080/ws");
+const socket = new WebSocket("/ws");
+
+socket.onopen = function () {
+  console.log("WebSocket connection opened");
+  // Now we can safely call resetGame or send messages
+};
 
 socket.onmessage = function (event) {
   const data = JSON.parse(event.data);
@@ -28,6 +33,11 @@ socket.onmessage = function (event) {
     console.log("Updated game state:", data);
     updateGameState(data.score, data.playerClicksLeft, data.isLocked);
   }
+};
+
+socket.onclose = function () {
+  console.log("WebSocket connection closed");
+  // Now we can safely call resetGame or send messages
 };
 
 // Send a click event
@@ -58,11 +68,6 @@ function resetGame() {
   //   }
   document.body.style.backgroundColor = "";
 }
-
-socket.onopen = function () {
-  console.log("WebSocket connection opened");
-  // Now we can safely call resetGame or send messages
-};
 
 // Update Functions
 function updateScore(newScore) {
