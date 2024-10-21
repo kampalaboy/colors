@@ -80,11 +80,6 @@
       </button> -->
       <button id="resetButton" onclick="resetGame()">Reset Game</button></br> 
       <div id="status">
-        1. Create a pattern with color button (minimum 3 clicks)</br> 
-        2. Lock the pattern </br> 
-        3. Play the pattern on the piano for points </br> </br> 
-
-        Make pattern as long as you like.  Longer pattern matching means more points!!
       </div></br> 
       <div id="score" style="font-size: 50px;"></div>
       <div id="clicks" style="font-size: 50px;"></div>
@@ -98,6 +93,72 @@
   
     <div id="instrument-wrapper" class="instrument-wrapper"></div>
     <audio id="audio" preload="auto"></audio>
+
+    <h1>Enter the Server</h1>
+    <div>
+      <input type="text" id="username" placeholder="Enter Username">
+      <button id="loginButton">Login</button>
+    </div>
+    <div id="gameInfo" style="display: none;">
+      <h2>Welcome, <span id="playerName"></span></h2>
+      <div class="player-list">
+        <h3>Top Scorers:</h3>
+        <ul id="topScorers"></ul>
+        <h3>Players Online:</h3>
+        <ul id="onlinePlayers"></ul>
+      </div>
+    </div>
+  
+    <script>
+      const loginButton = document.getElementById('loginButton');
+      const usernameInput = document.getElementById('username');
+      const playerNameElement = document.getElementById('playerName');
+      const topScorersElement = document.getElementById('topScorers');
+      const onlinePlayersElement = document.getElementById('onlinePlayers');
+      const gameInfo = document.getElementById('gameInfo');
+  
+      loginButton.onclick = function () {
+        const username = usernameInput.value;
+        if (username) {
+          fetch('/api/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ username })
+          })
+          .then(response => response.json())
+          .then(data => {
+            playerNameElement.textContent = username;
+            gameInfo.style.display = 'block';
+            displayTopScorers(data);
+            displayOnlinePlayers(data);
+          });
+        }
+      };
+  
+      function displayTopScorers(data) {
+        const topScorers = data.topScorers
+        if (topScorers && Array.isArray(topScorers)) {
+        topScorersElement.innerHTML = '';
+        topScorers.forEach(player => {
+          const li = document.createElement('li');
+          li.textContent = `${player.userName}: ${player.topScore}`;
+          topScorersElement.appendChild(li);
+        });
+      }
+    }
+  
+      function displayOnlinePlayers(data) {
+        const onlinePlayers = data.onlinePlayers
+        if (onlinePlayers && Array.isArray(onlinePlayers)){
+        onlinePlayersElement.innerHTML = '';
+        onlinePlayers.forEach(player => {
+          const li = document.createElement('li');
+          li.textContent = player.userName;
+          onlinePlayersElement.appendChild(li);
+        });
+      }
+      }
+    </script>
     <script>
       // function checkOrientation() {
       //   const instrumentWrapper = document.getElementById("instrument-wrapper");

@@ -21,6 +21,13 @@ var clients = make(map[*websocket.Conn]bool) // Keep track of connected clients
 var broadcast = make(chan Message)           // Channel for broadcasting messages to clients
 var mu sync.Mutex                            // Mutex for thread-safe access to game state
 
+type BroadcastMessage struct {
+    TopScorers    []server.Gamer `json:"topScorers"`
+    OnlinePlayers []server.Gamer `json:"onlinePlayers"`
+}
+
+var onlinePlayers = []server.Gamer{}
+
 type Message struct {
 	Action           string            `json:"action"`
 	ButtonClick      *server.ButtonClick `json:"buttonClick"`
@@ -50,6 +57,8 @@ func main() {
 	http.HandleFunc("/multiplayer", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./web/multiplayer.html")
 	})
+	
+	http.HandleFunc("/api/login", server.Login)
 
 	http.HandleFunc("/api/click", handleClick)
  	http.HandleFunc("/api/lock", handleLock)
@@ -303,17 +312,43 @@ func handleResetWS() {
 
 // Broadcast messages to all connected clients
 func handleMessages() {
-	for {
-		msg := <-broadcast
-		for client := range clients {
-			err := client.WriteJSON(msg)
-			if err != nil {
-				log.Printf("Error: %v", err)
-				client.Close()
-				delete(clients, client)
-			}
-		}
-	}
+	// for {
+	// 	msg := <-broadcast
+	// 	for client := range clients {
+	// 		err := client.WriteJSON(msg)
+	// 		if err != nil {
+	// 			log.Printf("Error: %v", err)
+	// 			client.Close()
+	// 			delete(clients, client)
+	// 		}
+	// 	}
+	// }
+
+	mu.Lock()
+    defer mu.Unlock()
+
+    // Prepare the message
+    message := BroadcastMessage{
+        //TopScorers:    []server.,
+        OnlinePlayers: onlinePlayers,
+    }
+
+    messageJSON, err := json.Marshal(message)
+    if err != nil {
+        log.Println("Error marshalling broadcast message:", err)
+        return
+    }
+
+    // Broadcast to all clients
+    for client := range clients {
+        err := client.WriteMessage(websocket.TextMessage, messageJSON)
+        if err != nil {
+            log.Printf("Error sending message to client: %v", err)
+            client.Close()
+            delete(clients, client)
+        }
+    }
+
 }
 
 func calculateScore(patternLength int) int {
