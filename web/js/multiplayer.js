@@ -256,21 +256,16 @@ function updatePlayerClicksLeft(newClicks) {
 }
 
 // // Game State Update
-function updateGameState(s, c, l) {
-  lockButton.disabled = l;
-  statusText.innerHTML = l
-    ? "Match the pattern!"
-    : `1. Create a pattern with color button (minimum 3 clicks)</br>
-         2. Lock the pattern </br>
-         3. Play the pattern on the piano for points </br></br>
-         Make pattern as long as you like. Longer pattern matching means more points!!`;
+function updateGameState(s, c) {
+  statusText.innerHTML =
+    "Get into a free server and play the color coding game!!!!";
 
   updateScore(s);
   updatePlayerClicksLeft(c);
   // console.log(`Score: ${s}, Player Clicks Left: ${c}`);
 }
 window.onload = function () {
-  updateGameState(0, 0, false);
+  updateGameState(0, 0);
 };
 
 window.addEventListener("load", function (evt) {
@@ -301,7 +296,7 @@ window.addEventListener("load", function (evt) {
       //print("RESPONSE: " + evt.data);
       const data = JSON.parse(evt.data);
       if (data.action === "update") {
-        updateGameState(data.score, data.playerClicksLeft, data.isLocked);
+        updateGameState(data.score, data.playerClicksLeft);
       }
     };
     ws.onerror = function (evt) {
@@ -318,6 +313,15 @@ window.addEventListener("load", function (evt) {
     const randomBackground = backgrounds[chooseColor];
     document.body.style.backgroundColor = randomBackground.color;
     ws.send(
+      JSON.stringify({
+        action: "click",
+        buttonClick: {
+          fromPlayer: false,
+          ...randomBackground,
+        },
+      })
+    );
+    print(
       JSON.stringify({
         action: "click",
         buttonClick: {
@@ -344,7 +348,7 @@ window.addEventListener("load", function (evt) {
     // Clear background and update game state visually
     document.body.style.backgroundColor = "";
 
-    updateGameState(0, 0, false);
+    updateGameState(0, 0);
     return false;
   };
 
