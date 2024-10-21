@@ -1,7 +1,7 @@
 // Data for the game
 
 const backgrounds = [
-  { id: 0, color: "black", note: "./public/snare.wav", key: " " },
+  { id: 0, color: "black", note: "./public/S.mp3", key: " " },
   { id: 1, color: "red", note: "./public/C.mp3", key: "a" },
   { id: 2, color: "orange", note: "./public/D.mp3", key: "s" },
   { id: 3, color: "yellow", note: "./public/E.mp3", key: "d" },
@@ -44,7 +44,7 @@ randomColorbutton.addEventListener("click", async () => {
     if (currentAudio !== undefined) {
       currentAudio
         .then((_) => {
-          //audioElement.pause();
+          currentAudio;
         })
         .catch((error) => {
           console.log(error);
@@ -61,6 +61,8 @@ function playInstrument() {
     instrument.appendChild(instrumentButton);
 
     instrumentButton.id = `piano-key-${b.id}`;
+    // instrumentButton.style.height = "150px";
+    // instrumentButton.style.width = "2px";
     instrumentButton.classList.add("instrument-button");
 
     const player = async (buttonData) => {
@@ -73,6 +75,7 @@ function playInstrument() {
         if (currentAudio !== undefined) {
           currentAudio
             .then((_) => {
+              currentAudio;
               //audioElement.pause();
             })
             .catch((error) => {
@@ -200,6 +203,11 @@ async function resetGame() {
 
     isLocked = false;
     document.body.style.backgroundColor = "";
+
+    const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
+    pianoKeys.forEach((key) => {
+      key.style.backgroundColor = ""; // Reset color to default
+    });
 
     const result = await response.json();
 

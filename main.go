@@ -26,11 +26,13 @@ type Message struct {
 	ButtonClick      *server.ButtonClick `json:"buttonClick"`
 	Score            int               `json:"score"`
 	IsLocked         bool              `json:"isLocked"`
+	FromPlayer 		bool				`json:"fromPlayer"`
 	PlayerClicksLeft int               `json:"playerClicksLeft"`
+	PlayerTurn 		[]server.ButtonClick `json:"playerTurn"`
 	Pattern          []server.ButtonClick `json:"pattern"`
 }
 
-var game = server.GameState{
+var game = &server.GameState{
 	Pattern:          make([]server.ButtonClick, 0),
 	PlayerTurn:       make([]server.ButtonClick, 0),
 	IsLocked:         false,
@@ -69,6 +71,102 @@ func main() {
 }
 
 // Handle WebSocket connections
+// func handleConnections(w http.ResponseWriter, r *http.Request) {
+//     ws, err := upgrader.Upgrade(w, r, nil)
+//     if err != nil {
+//         log.Printf("Failed to upgrade connection: %v", err)
+//         return
+//     }
+    
+//     // Ensure connection cleanup
+//     defer func() {
+//         mu.Lock()
+//         delete(clients, ws)
+//         mu.Unlock()
+//         ws.Close()
+//     }()
+
+//     // Add client with thread safety
+//     mu.Lock()
+//     if len(clients) >= 100 { // Maximum connection limit
+//         mu.Unlock()
+//         ws.WriteJSON(Message{
+//             Action: "error",
+//             Score: -1,
+//             IsLocked: false,
+//             FromPlayer: false,
+//             PlayerClicksLeft: 0,
+//             Pattern: nil,
+//         })
+//         return
+//     }
+//     clients[ws] = true
+//     mu.Unlock()
+
+//     // Notify other clients about new connection
+//     broadcast <- Message{
+//         Action: "playerJoined",
+//         Score: game.Score,
+//         IsLocked: game.IsLocked,
+//         PlayerClicksLeft: game.PlayerClicksLeft,
+//     }
+
+//     for {
+//         var msg Message
+//         err := ws.ReadJSON(&msg)
+//         if err != nil {
+//             if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+//                 log.Printf("WebSocket error: %v", err)
+//             }
+//             break
+//         }
+
+//         mu.Lock()
+//         if game == nil {
+//             mu.Unlock()
+//             log.Println("Game state is nil!")
+//             ws.WriteJSON(Message{
+//                 Action: "error",
+//                 Score: -1,
+//             })
+//             break
+//         }
+
+//         // Handle different actions received from clients
+//         switch msg.Action {
+//         case "click":
+//             if msg.ButtonClick == nil {
+//                 ws.WriteJSON(Message{
+//                     Action: "error",
+//                     Score: -1,
+//                 })
+//                 mu.Unlock()
+//                 continue
+//             }
+//             handleClickWS(msg.ButtonClick)
+//         case "lock":
+//             handleLockWS()
+//         case "reset":
+//             handleResetWS()
+//         default:
+//             log.Printf("Unknown action received: %s", msg.Action)
+//             mu.Unlock()
+//             continue
+//         }
+//         mu.Unlock()
+
+//         // Broadcast updated game state
+//         broadcast <- Message{
+//             Action:           "update",
+//             Score:            game.Score,
+//             IsLocked:         game.IsLocked,
+//             FromPlayer:       msg.ButtonClick.FromPlayer,
+//             PlayerClicksLeft: game.PlayerClicksLeft,
+//             Pattern:          game.Pattern,
+//         }
+//     }
+// }
+
 func handleConnections(w http.ResponseWriter, r *http.Request) {
 	
 	ws, err := upgrader.Upgrade(w, r, nil)
@@ -87,6 +185,10 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			delete(clients, ws)
 			break
 		}
+		if game == nil {
+            log.Println("Game state is nil!")
+            break
+        }
 
 		// Handle different actions received from clients
 		switch msg.Action {
@@ -103,8 +205,10 @@ func handleConnections(w http.ResponseWriter, r *http.Request) {
 			Action:           "update",
 			Score:            game.Score,
 			IsLocked:         game.IsLocked,
+			//FromPlayer:       msg.ButtonClick.FromPlayer,
 			PlayerClicksLeft: game.PlayerClicksLeft,
 			Pattern:          game.Pattern,
+			
 		}
 
 		fmt.Print(msg);
@@ -145,26 +249,56 @@ func handleClickWS(click *server.ButtonClick) {
 }
 
 func handleLockWS() {
-	mu.Lock()
-	defer mu.Unlock()
+    mu.Lock()
+    defer mu.Unlock()
 
-	if len(game.Pattern) < 3 {
-		return
-	}
+    log.Printf("Game state before locking: %+v", game)
 
-	game.IsLocked = true
-	game.PlayerTurn = make([]server.ButtonClick, 0)
+    if game == nil {
+        log.Println("Game object is nil")
+        return
+    }
+
+    if len(game.Pattern) < 3 {
+        log.Println("Pattern length is too short")
+        return
+    }
+
+    game.IsLocked = true
+    log.Println("Game is now locked")
+
+    if game.PlayerTurn == nil {
+        log.Println("Initializing PlayerTurn slice")
+        game.PlayerTurn = make([]server.ButtonClick, 0)
+    } else {
+        log.Println("PlayerTurn slice already initialized")
+    }
+
+    game.PlayerTurn = make([]server.ButtonClick, 0)
 }
+
 
 func handleResetWS() {
 	mu.Lock()
 	defer mu.Unlock()
+   // Reset the game state
+   game.Pattern = make([]server.ButtonClick, 0)
+   game.PlayerTurn = make([]server.ButtonClick, 0)
+   game.IsLocked = false
+   game.Score = 0
+   game.PlayerClicksLeft = 0
 
-	game.Pattern = make([]server.ButtonClick, 0)
-	game.PlayerTurn = make([]server.ButtonClick, 0)
-	game.IsLocked = false
-	game.Score = 0
-	game.PlayerClicksLeft = 0
+   // Create a new Message with the updated game state
+   msg := Message{
+	   Pattern:          game.Pattern,
+	   PlayerTurn:       game.PlayerTurn,
+	   IsLocked:         game.IsLocked,
+	   Score:            game.Score,
+	   PlayerClicksLeft: game.PlayerClicksLeft,
+   }
+
+   // Send the message to the broadcast channel
+   broadcast <- msg
 }
 
 // Broadcast messages to all connected clients

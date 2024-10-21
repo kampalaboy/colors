@@ -33,7 +33,7 @@ type GameState struct {
 	Mu         sync.RWMutex
 }
 
-var Game = GameState{
+var Game = &GameState{
 	Pattern:    make([]ButtonClick, 0),
 	PlayerTurn: make([]ButtonClick, 0),
 	IsLocked:   false,
