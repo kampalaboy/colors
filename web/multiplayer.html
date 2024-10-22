@@ -6,33 +6,65 @@
     <title>COLORS</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon"/>
     <style>
-      body {
+body {
         margin: 0;
-        height: 100vh;
-        position: relative;
-        animation: glow 3s infinite alternate;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
         color: teal;
+        padding: 20px;
+        box-sizing: border-box;
       }
 
-      .gameControls {
-        padding: 25px;
+      header {
+        width: 100%;
+        margin-bottom: 20px;
       }
 
-      .button-wrapper {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: fit-content;
-        height: fit-content;
-        padding-bottom: 25px;
+      nav ul {
+        display: flex;
+        justify-content: center;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        flex-wrap: wrap;
       }
+
+      nav ul li {
+        padding: 15px;
+        margin: 5px;
+      }
+
+      nav ul li a {
+        text-decoration: none;
+        color: #000;
+        font-size: 18px;
+      }
+
+      h1 {
+        text-align: center;
+        margin: 20px 0;
+      }
+
+      .game-container {
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0 auto;
+      }
+
+      /* .control-buttons {
+        margin: 1px 0;
+      } */
 
       button {
         padding: 10px 20px;
         font-size: 16px;
         cursor: pointer;
-        margin: 0;
+        margin: 5px;
         border: 2px solid #333;
         border-radius: 4px;
         background-color: #fff;
@@ -42,21 +74,96 @@
         background-color: #f0f0f0;
       }
 
-      .instrument-wrapper {
-        display: flex;
-        position: fixed;
-        justify-content: center;
-        bottom: 0;
-        padding: 10px;
-        width: 100%;
+      #status {
+        text-align: center;
+        margin: 20px 0;
+        line-height: 1.5;
       }
 
-      /* @media screen and (max-width: 850px) {
-        .instrument-wrapper {
-          max-width: 250px;
-          align-content: center;
+      #score,
+      #clicks {
+        font-size: 50px;
+        text-align: center;
+        margin: 10px 10px;
+      }
+
+      .button-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        /* margin: 1px 0; */
+      }
+
+      .instrument-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+        /* margin-top: auto; */
+        position: relative;
+        bottom: 0;
+      }
+
+      .instrument-button {
+        height: 150px;
+        margin: 3px;
+        border: solid black 10px;
+      }
+
+      @media (max-width: 768px) {
+        .instrument-button {
+          height: 150px;
+          width: 5px;
+          margin: 2px;
         }
-      } */
+      }
+
+      @media (max-width: 480px) {
+        .instrument-button {
+          height: 150px;
+          width: 10px;
+          margin: 2px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        nav ul {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        nav ul li {
+          padding: 10px;
+        }
+
+        button {
+          width: 100%;
+          max-width: 300px;
+          margin: 5px 0;
+        }
+
+        #score,
+        #clicks {
+          font-size: 36px;
+        }
+
+        .instrument-wrapper {
+          width: calc(100% - 20px);
+          padding: 10px;
+          margin: 0 10px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        /* Optional: Add smooth scrolling for touch devices */
+        .instrument-wrapper::-webkit-scrollbar {
+          height: 4px;
+        }
+
+        .instrument-wrapper::-webkit-scrollbar-thumb {
+          border-radius: 2px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -74,30 +181,29 @@
   </header>
     <h1> ONLY FoR THE BRAVE!!!</h1>
     <div id="gameControls" class="gameControls">
-      <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
+      <!-- <button id="lockButton" onclick="lockPattern()">Lock Pattern</button> -->
       <!-- <button id="unlockButton" onclick="unlockPattern()">
         UnLock Pattern
       </button> -->
-      <button id="resetButton" onclick="resetGame()">Reset Game</button></br> 
+      <!-- <button id="resetButton" onclick="resetGame()">Reset Game</button></br> 
       <div id="status">
       </div></br> 
       <div id="score" style="font-size: 50px;"></div>
       <div id="clicks" style="font-size: 50px;"></div>
-    </div>
-    <div class="button-wrapper">
-      <button id="color">COLOR</button>
-    </div>
-    <button id="open">STart SerVer</button>
-    <button id="close">StOp SerVer</button>  
-    <div id="output" style="max-height: 70vh;overflow-y: scroll;"></div>
-  
-    <div id="instrument-wrapper" class="instrument-wrapper"></div>
-    <audio id="audio" preload="auto"></audio>
-
+    </div> -->
     <h1>Enter the Server</h1>
     <div>
-      <input type="text" id="username" placeholder="Enter Username">
-      <button id="loginButton">Login</button>
+      <form id="server-selection">
+        <input type="text" id="server-type">
+        <input type="text" id="username" name="username" placeholder="Enter Username">
+        <input type="submit">
+        <select id="server-input" name="server-type">
+          <option value="general">General</option>
+          <option value="music">Music</option>
+          <option value="colors">Colors</option>
+          <option value="secrets">Secrets</option>
+        </select>
+      </form>
     </div>
     <div id="gameInfo" style="display: none;">
       <h2>Welcome, <span id="playerName"></span></h2>
@@ -108,55 +214,67 @@
         <ul id="onlinePlayers"></ul>
       </div>
     </div>
-  
+
+    <div id="instrument-wrapper" class="instrument-wrapper"></div>
+    <audio id="audio" preload="auto"></audio>
     <script>
-      const loginButton = document.getElementById('loginButton');
-      const usernameInput = document.getElementById('username');
-      const playerNameElement = document.getElementById('playerName');
-      const topScorersElement = document.getElementById('topScorers');
-      const onlinePlayersElement = document.getElementById('onlinePlayers');
-      const gameInfo = document.getElementById('gameInfo');
+
+      const selectServer = document.getElementById("server-input")
+      const serverInput = document.getElementById("server-type")
+
+      const serverTypes = ["General", "Music", "Colors", "Secrets"]
+      serverInput.value = serverTypes[0]
+       selectServer.addEventListener("change", function(){
+        i = selectServer.selectedIndex
+        serverInput.value = serverTypes[i]
+       })
+      // const loginButton = document.getElementById('loginButton');
+      // const usernameInput = document.getElementById('username');
+      // const playerNameElement = document.getElementById('playerName');
+      // const topScorersElement = document.getElementById('topScorers');
+      // const onlinePlayersElement = document.getElementById('onlinePlayers');
+      // const gameInfo = document.getElementById('gameInfo');
   
-      loginButton.onclick = function () {
-        const username = usernameInput.value;
-        if (username) {
-          fetch('/api/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username })
-          })
-          .then(response => response.json())
-          .then(data => {
-            playerNameElement.textContent = username;
-            gameInfo.style.display = 'block';
-            displayTopScorers(data);
-            displayOnlinePlayers(data);
-          });
-        }
-      };
+      // loginButton.onclick = function () {
+      //   const username = usernameInput.value;
+      //   if (username) {
+      //     fetch('/api/login', {
+      //       method: 'POST',
+      //       headers: { 'Content-Type': 'application/json' },
+      //       body: JSON.stringify({ username })
+      //     })
+      //     .then(response => response.json())
+      //     // .then(data => {
+      //     //   playerNameElement.textContent = username;
+      //     //   gameInfo.style.display = 'block';
+      //     //   displayTopScorers(data);
+      //     //   displayOnlinePlayers(data);
+      //     // });
+      //   }
+      // };
   
-      function displayTopScorers(data) {
-        const topScorers = data.topScorers
-        if (topScorers && Array.isArray(topScorers)) {
-        topScorersElement.innerHTML = '';
-        topScorers.forEach(player => {
-          const li = document.createElement('li');
-          li.textContent = `${player.userName}: ${player.topScore}`;
-          topScorersElement.appendChild(li);
-        });
-      }
-    }
+    //   function displayTopScorers(data) {
+    //     const topScorers = data.topScorers
+    //     if (topScorers && Array.isArray(topScorers)) {
+    //     topScorersElement.innerHTML = '';
+    //     topScorers.forEach(player => {
+    //       const li = document.createElement('li');
+    //       li.textContent = `${player.userName}: ${player.topScore}`;
+    //       topScorersElement.appendChild(li);
+    //     });
+    //   }
+    // }
   
-      function displayOnlinePlayers(data) {
-        const onlinePlayers = data.onlinePlayers
-        if (onlinePlayers && Array.isArray(onlinePlayers)){
+      function displayOnlinePlayers(player) {
+        //const onlinePlayers = data.onlinePlayers
+
         onlinePlayersElement.innerHTML = '';
-        onlinePlayers.forEach(player => {
+    //    players.forEach(player => {
           const li = document.createElement('li');
-          li.textContent = player.userName;
+          li.textContent = player;
           onlinePlayersElement.appendChild(li);
-        });
-      }
+          return player
+      //  });
       }
     </script>
     <script>

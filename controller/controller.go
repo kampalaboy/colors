@@ -1,4 +1,4 @@
-package server
+package controller
 
 import (
 	"encoding/json"
@@ -12,9 +12,9 @@ type Account struct{
 }
 
 type Gamer struct{
-	Id int 
+	Id int `json:"id"`
 	UserName string	`json:"username"`
-	TopScore int64
+	TopScore int64 `json:"topScore"`
 }
 
 type ButtonClick struct {
@@ -75,6 +75,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var player Account
+	var id = player.Id
 	err := json.NewDecoder(r.Body).Decode(&player)
 	if err != nil || player.UserName == "" {
 		http.Error(w, "Invalid username", http.StatusBadRequest)
@@ -87,6 +88,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
+		"id": id,
 		"topScorers":    getTopScorers(),
 		"onlinePlayers": onlinePlayers,
 	})
