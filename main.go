@@ -7,18 +7,22 @@ import (
 
 func main(){
 	connectHttpServer()
+	port := ":8080"
+	log.Printf("Started on localhost%s", port)
+	log.Fatal(http.ListenAndServe(port, nil))
 
-	wifiIP := "localhost:3000"
+	//wifiIP := "localhost:3000"
 	
-	log.Printf("Server starting on http://%s", wifiIP)
-	if err := http.ListenAndServe(wifiIP, nil); err != nil {
-		log.Fatal(err)
-	}
+	//log.Printf("Server starting on http://%s", wifiIP)
+
+	// if err := http.ListenAndServe(wifiIP, nil); err != nil {
+	// 	log.Fatal(err)
+	// }
 }
 
 func connectHttpServer(){
-	fs:= http.FileServer(http.Dir("./web") )
-	http.Handle("/",fs)
+//fs:= http.FileServer(http.Dir("./web") )
+	http.Handle("/",http.FileServer(http.Dir("./web") ))
 
 	handler := NewHandler()
 

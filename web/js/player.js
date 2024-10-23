@@ -121,118 +121,133 @@ function playInstrument() {
   });
 }
 
-const sendClickData = async (buttonData, fromPlayer) => {
-  try {
-    const response = await fetch("/api/click", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        id: buttonData.id,
-        color: buttonData.color,
-        note: buttonData.note,
-        key: buttonData.key,
-        fromPlayer: fromPlayer,
-      }),
-    });
+// const sendClickData = async (buttonData, fromPlayer) => {
+//   try {
+//     const response = await fetch("/api/click", {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: JSON.stringify({
+//         id: buttonData.id,
+//         color: buttonData.color,
+//         note: buttonData.note,
+//         key: buttonData.key,
+//         fromPlayer: fromPlayer,
+//       }),
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const result = await response.json();
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
+//     const result = await response.json();
 
-    isLocked = false;
-    updateGameState(result.score, result.playerClicksLeft, isLocked);
+//     isLocked = false;
+//     updateGameState(result.score, result.playerClicksLeft, isLocked);
 
-    return result;
-  } catch (error) {
-    alert("Error sending click data:", error);
-  }
-};
+//     return result;
+//   } catch (error) {
+//     alert("Error sending click data:", error);
+//   }
+// };
 
-async function lockPattern() {
-  try {
-    const response = await fetch("/api/lock", {
-      method: "POST",
-    });
+// async function lockPattern() {
+//   try {
+//     const response = await fetch("/api/lock", {
+//       method: "POST",
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
 
-    const result = await response.json();
-    isLocked = true;
-    updateGameState(result.score, result.playerClicksLeft, isLocked);
-    return result;
-  } catch (error) {
-    alert("Must be minimum 3 random");
-  }
-}
+//     const result = await response.json();
+//     isLocked = true;
+//     updateGameState(result.score, result.playerClicksLeft, isLocked);
+//     return result;
+//   } catch (error) {
+//     alert("Must be minimum 3 random");
+//   }
+// }
 
-async function unlockPattern() {
-  try {
-    const response = await fetch("/api/unlock", {
-      method: "POST",
-    });
+// async function unlockPattern() {
+//   try {
+//     const response = await fetch("/api/unlock", {
+//       method: "POST",
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
 
-    const result = await response.json();
-    isLocked = false;
-    updateGameState();
-    return result;
-  } catch (error) {
-    alert("Error locking pattern:", error);
-  }
-}
+//     const result = await response.json();
+//     isLocked = false;
+//     updateGameState();
+//     return result;
+//   } catch (error) {
+//     alert("Error locking pattern:", error);
+//   }
+// }
 
-// Resetters for the game
+// // Resetters for the game
 
-async function resetGame() {
-  try {
-    const response = await fetch("/api/reset", {
-      method: "POST",
-    });
+// async function resetGame() {
+//   try {
+//     const response = await fetch("/api/reset", {
+//       method: "POST",
+//     });
 
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
+//     if (!response.ok) {
+//       throw new Error(`HTTP error! status: ${response.status}`);
+//     }
 
-    isLocked = false;
-    document.body.style.backgroundColor = "";
+//     isLocked = false;
+//     document.body.style.backgroundColor = "";
 
-    const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
-    pianoKeys.forEach((key) => {
-      key.style.backgroundColor = ""; // Reset color to default
-    });
+//     const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
+//     pianoKeys.forEach((key) => {
+//       key.style.backgroundColor = ""; // Reset color to default
+//     });
 
-    const result = await response.json();
+//     const result = await response.json();
 
-    updateGameState(result.score, result.playerClicksLeft, isLocked);
-  } catch (error) {
-    alert("Error resetting game:", error);
-  }
-}
+//     updateGameState(result.score, result.playerClicksLeft, isLocked);
+//   } catch (error) {
+//     alert("Error resetting game:", error);
+//   }
+// }
 
-function updateScore(newScore) {
-  if (scoreElement) {
-    scoreElement.textContent = `Score: ${newScore}`;
-  }
-}
+// function updateScore(newScore) {
+//   if (scoreElement) {
+//     scoreElement.textContent = `Score: ${newScore}`;
+//   }
+// }
 
-function updatePlayerClicksLeft(newClicks) {
-  if (clicksElement) {
-    clicksElement.textContent = `Clicks: ${newClicks}`;
-  }
-}
+// function updatePlayerClicksLeft(newClicks) {
+//   if (clicksElement) {
+//     clicksElement.textContent = `Clicks: ${newClicks}`;
+//   }
+// }
 
 window.onload = function () {
   updateScore(0);
   updatePlayerClicksLeft(0);
   resetGame();
+};
+
+window.onload = function () {
+  document.getElementById("server-selection").onsubmit = changeServer;
+
+  if (window["WebSocket"]) {
+    console.log("Supported");
+
+    conn = new WebSocket("ws://" + document.location.host + "/ws");
+    conn.onmessage = function (evt) {
+      console.log(evt);
+    };
+  } else {
+    alert("Web Sockets Unsupported :(");
+  }
 };
 
 function updateGameState(s, c, l) {

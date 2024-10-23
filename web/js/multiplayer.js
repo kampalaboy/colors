@@ -468,12 +468,49 @@
 //   };
 // });
 
+class gameEvent {
+  constructor(type, payload) {
+    this.type = type;
+    this.payload = payload;
+  }
+}
+function actionEvent(evt) {
+  if (evt.type === undefined) {
+    alert("Game Event Not Recognised");
+  }
+
+  switch (evt.type) {
+    case "new_gamer":
+      console.log("new_gamer");
+      break;
+    default:
+      alert("Event Type Not Supported");
+      break;
+  }
+}
+
+function sendEvent(eventName, payload) {
+  const event = new gameEvent(eventName, payload);
+
+  conn.send(JSON.stringify(event));
+}
+
 function changeServer() {
   const newServer = document.getElementById("server-type");
-  if (newServer != null) {
-    console.log(newServer.value);
-    conn.send(newServer.value);
+  const usernameInput = document.getElementById("username");
+  if (newServer != null && usernameInput != null) {
+    console.log(`You connected to ${newServer.value} server`);
+
+    sendEvent(
+      "new_gamer",
+      `${usernameInput.value} connected to ${newServer.value} server`
+    );
   }
+  // if (usernameInput != null) {
+  //   console.log(usernameInput.value);
+
+  //   sendEvent("new_gamer", usernameInput.value);
+  // }
   return false;
 }
 
@@ -484,6 +521,9 @@ window.onload = function () {
     console.log("Supported");
 
     conn = new WebSocket("ws://" + document.location.host + "/ws");
+    conn.onmessage = function (evt) {
+      console.log(evt);
+    };
   } else {
     alert("Web Sockets Unsupported :(");
   }
