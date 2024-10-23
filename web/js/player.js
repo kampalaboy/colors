@@ -21,95 +21,125 @@ const clicksElement = document.getElementById("clicks");
 const lockButton = document.getElementById("lockButton");
 const statusText = document.getElementById("status");
 
-randomColorbutton.addEventListener("click", async () => {
+class gameEvent {
+  constructor(type, payload) {
+    this.type = type;
+    this.payload = payload;
+  }
+}
+function actionEvent(evt) {
+  if (evt.type === undefined) {
+    alert("Game Event Not Recognised");
+  }
+  console.log(evt);
+  switch (evt.type) {
+    case "new_gamer":
+      console.log("new gamer");
+      break;
+    case "new_clicks":
+      console.log("new click");
+      break;
+    default:
+      alert("Event Type Not Supported");
+      break;
+  }
+}
+
+function sendEvent(eventName, payload) {
+  const event = new gameEvent(eventName, payload);
+
+  conn.send(JSON.stringify(event));
+}
+
+function randomColors() {
+  if (!conn) {
+    return false;
+  }
   const chooseColor = Math.floor(Math.random() * backgrounds.length);
   const randomBackground = backgrounds[chooseColor];
-
-  const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
-  pianoKeys.forEach((key) => {
-    key.style.backgroundColor = ""; // Reset color to default
-  });
-
-  const instrumentButton = document.getElementById(
-    `piano-key-${randomBackground.id}`
-  );
-
   document.body.style.backgroundColor = randomBackground.color;
-  instrumentButton.style.backgroundColor = randomBackground.color;
 
-  if (randomBackground.note) {
-    audioElement.src = randomBackground.note;
+  audioElement.src = randomBackground.note;
 
-    var currentAudio = audioElement.play();
-    if (currentAudio !== undefined) {
-      currentAudio
-        .then((_) => {
-          currentAudio;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-
-    await sendClickData(randomBackground, false);
+  var currentAudio = audioElement.play();
+  if (currentAudio !== undefined) {
+    currentAudio
+      .then((_) => {
+        currentAudio;
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   }
-});
+  sendEvent("new_clicks", randomBackground);
+  // print(
+  //   JSON.stringify({
+  //     action: "click",
+  //     buttonClick: {
+  //       fromPlayer: false,
+  //       ...randomBackground,
+  //     },
+  //   })
+  // );
+  return false;
+}
 
+// Setup Instrument Buttons
 function playInstrument() {
   backgrounds.forEach((b, index) => {
     const instrumentButton = document.createElement("button");
     instrument.appendChild(instrumentButton);
+    instrumentButton.style.margin = "3px";
+    instrumentButton.style.height = "150px";
 
-    instrumentButton.id = `piano-key-${b.id}`;
-    // instrumentButton.style.height = "150px";
-    // instrumentButton.style.width = "2px";
-    instrumentButton.classList.add("instrument-button");
-
-    const player = async (buttonData) => {
+    const player = async () => {
       if (b.note) {
         instrumentButton.style.backgroundColor = b.color;
 
         audioElement.src = b.note;
-        var currentAudio = audioElement.play();
 
+        var currentAudio = audioElement.play();
         if (currentAudio !== undefined) {
           currentAudio
             .then((_) => {
               currentAudio;
-              //audioElement.pause();
             })
             .catch((error) => {
               console.log(error);
             });
         }
-        //await currentAudio;
-        await sendClickData(buttonData, true);
       }
+      if (!conn) {
+        return false;
+      }
+      sendEvent("new_clicks", b);
     };
+
     instrumentButton.addEventListener("mousedown", () => {
-      player(b);
+      player();
     });
-    instrumentButton.addEventListener(
-      "touchstart",
-      () => {
-        player(b);
-      },
-      { passive: false }
-    );
+
+    instrumentButton.addEventListener("touchstart", (event) => {
+      event.preventDefault(); // Prevent default behavior for touch
+      player();
+    });
+
     window.addEventListener("keydown", (event) => {
-      console.log(event);
       if (event.key === b.key && !event.repeat) {
-        player(b);
+        player();
       }
     });
+
     instrumentButton.addEventListener("mouseup", () => {
       instrumentButton.style.backgroundColor = "";
     });
+
     window.addEventListener("keyup", (event) => {
       if (event.key === b.key) {
         instrumentButton.style.backgroundColor = "";
       }
     });
+
     instrumentButton.addEventListener(
       "touchend",
       (event) => {
@@ -120,6 +150,162 @@ function playInstrument() {
     );
   });
 }
+
+function updateGameState(s, c, l) {
+  if (l) {
+    lockButton.disabled = true;
+    statusText.textContent = "Match the pattern!";
+    document.body.style.backgroundColor = "";
+    const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
+    pianoKeys.forEach((key) => {
+      key.style.backgroundColor = ""; // Reset color to default
+    });
+  } else {
+    lockButton.disabled = false;
+
+    statusText.innerHTML = `1. Create a pattern with color button (minimum 3 clicks)</br>
+                        2. Lock the pattern </br>
+                        3. Play the pattern on the piano for points </br></br>
+    Make pattern as long as you like.  Longer pattern matching means more points!!`;
+    updateScore(s);
+    updatePlayerClicksLeft(c);
+  }
+}
+
+function updateScore(newScore) {
+  if (scoreElement) {
+    scoreElement.textContent = `Score: ${newScore}`;
+  }
+}
+
+function updatePlayerClicksLeft(newClicks) {
+  if (clicksElement) {
+    clicksElement.textContent = `Clicks: ${newClicks}`;
+  }
+}
+
+playInstrument();
+
+window.onload = function () {
+  randomColorbutton.onclick = randomColors;
+
+  if (window["WebSocket"]) {
+    console.log("Supported");
+
+    conn = new WebSocket("wss://" + document.location.host + "/ws");
+    conn.onmessage = function (evt) {
+      const data = JSON.parse(evt.data);
+      const event = Object.assign(new gameEvent(), data);
+
+      actionEvent(event);
+    };
+  } else {
+    alert("Web Sockets Unsupported :(");
+  }
+
+  updateGameState(0, 0, false);
+  //resetGame();
+};
+
+// randomColorbutton.addEventListener("click", async () => {
+//   const chooseColor = Math.floor(Math.random() * backgrounds.length);
+//   const randomBackground = backgrounds[chooseColor];
+
+//   const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
+//   pianoKeys.forEach((key) => {
+//     key.style.backgroundColor = ""; // Reset color to default
+//   });
+
+//   const instrumentButton = document.getElementById(
+//     `piano-key-${randomBackground.id}`
+//   );
+
+//   document.body.style.backgroundColor = randomBackground.color;
+//   instrumentButton.style.backgroundColor = randomBackground.color;
+
+//   if (randomBackground.note) {
+//     audioElement.src = randomBackground.note;
+
+//     var currentAudio = audioElement.play();
+//     if (currentAudio !== undefined) {
+//       currentAudio
+//         .then((_) => {
+//           currentAudio;
+//         })
+//         .catch((error) => {
+//           console.log(error);
+//         });
+//     }
+
+//     await sendClickData(randomBackground, false);
+//   }
+// });
+
+// function playInstrument() {
+//   backgrounds.forEach((b, index) => {
+//     const instrumentButton = document.createElement("button");
+//     instrument.appendChild(instrumentButton);
+
+//     instrumentButton.id = `piano-key-${b.id}`;
+//     // instrumentButton.style.height = "150px";
+//     // instrumentButton.style.width = "2px";
+//     instrumentButton.classList.add("instrument-button");
+
+//     const player = async (buttonData) => {
+//       if (b.note) {
+//         instrumentButton.style.backgroundColor = b.color;
+
+//         audioElement.src = b.note;
+//         var currentAudio = audioElement.play();
+
+//         if (currentAudio !== undefined) {
+//           currentAudio
+//             .then((_) => {
+//               currentAudio;
+//               //audioElement.pause();
+//             })
+//             .catch((error) => {
+//               console.log(error);
+//             });
+//         }
+//         //await currentAudio;
+//         await sendClickData(buttonData, true);
+//       }
+//     };
+//     instrumentButton.addEventListener("mousedown", () => {
+//       player(b);
+//     });
+//     instrumentButton.addEventListener(
+//       "touchstart",
+//       () => {
+//         player(b);
+//       },
+//       { passive: false }
+//     );
+//     window.addEventListener("keydown", (event) => {
+//       console.log(event);
+//       if (event.key === b.key && !event.repeat) {
+//         player(b);
+//       }
+//     });
+//     instrumentButton.addEventListener("mouseup", () => {
+//       instrumentButton.style.backgroundColor = "";
+//     });
+//     window.addEventListener("keyup", (event) => {
+//       if (event.key === b.key) {
+//         instrumentButton.style.backgroundColor = "";
+//       }
+//     });
+//     instrumentButton.addEventListener(
+//       "touchend",
+//       (event) => {
+//         event.preventDefault();
+//         instrumentButton.style.backgroundColor = "";
+//       },
+//       { passive: false }
+//     );
+//   });
+// }
 
 // const sendClickData = async (buttonData, fromPlayer) => {
 //   try {
@@ -142,8 +328,7 @@ function playInstrument() {
 //     }
 //     const result = await response.json();
 
-//     isLocked = false;
-//     updateGameState(result.score, result.playerClicksLeft, isLocked);
+//     updateGameState(result.score, result.playerClicksLeft, false);
 
 //     return result;
 //   } catch (error) {
@@ -217,9 +402,9 @@ function playInstrument() {
 //   }
 // }
 
-// function updateScore(newScore) {
+// function updateScore(neconncore) {
 //   if (scoreElement) {
-//     scoreElement.textContent = `Score: ${newScore}`;
+//     scoreElement.textContent = `Score: ${neconncore}`;
 //   }
 // }
 
@@ -228,47 +413,3 @@ function playInstrument() {
 //     clicksElement.textContent = `Clicks: ${newClicks}`;
 //   }
 // }
-
-window.onload = function () {
-  updateScore(0);
-  updatePlayerClicksLeft(0);
-  resetGame();
-};
-
-window.onload = function () {
-  document.getElementById("server-selection").onsubmit = changeServer;
-
-  if (window["WebSocket"]) {
-    console.log("Supported");
-
-    conn = new WebSocket("ws://" + document.location.host + "/ws");
-    conn.onmessage = function (evt) {
-      console.log(evt);
-    };
-  } else {
-    alert("Web Sockets Unsupported :(");
-  }
-};
-
-function updateGameState(s, c, l) {
-  if (l) {
-    lockButton.disabled = true;
-    statusText.textContent = "Match the pattern!";
-    document.body.style.backgroundColor = "";
-    const pianoKeys = document.querySelectorAll("[id^='piano-key-']");
-    pianoKeys.forEach((key) => {
-      key.style.backgroundColor = ""; // Reset color to default
-    });
-  } else {
-    lockButton.disabled = false;
-
-    statusText.innerHTML = `1. Create a pattern with color button (minimum 3 clicks)</br>
-                        2. Lock the pattern </br>
-                        3. Play the pattern on the piano for points </br></br>
-    Make pattern as long as you like.  Longer pattern matching means more points!!`;
-    updateScore(s);
-    updatePlayerClicksLeft(c);
-  }
-}
-
-playInstrument();

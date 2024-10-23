@@ -478,7 +478,7 @@ function actionEvent(evt) {
   if (evt.type === undefined) {
     alert("Game Event Not Recognised");
   }
-
+  console.log(evt);
   switch (evt.type) {
     case "new_gamer":
       console.log("new_gamer");
@@ -496,35 +496,71 @@ function sendEvent(eventName, payload) {
 }
 
 function changeServer() {
-  const newServer = document.getElementById("server-type");
-  const usernameInput = document.getElementById("username");
-  if (newServer != null && usernameInput != null) {
-    console.log(`You connected to ${newServer.value} server`);
+  //const newServer = document.getElementById("server-type");
+  //const usernameInput = document.getElementById("username");
 
-    sendEvent(
-      "new_gamer",
-      `${usernameInput.value} connected to ${newServer.value} server`
-    );
-  }
-  // if (usernameInput != null) {
-  //   console.log(usernameInput.value);
+  let formData = {
+    workingserver: document.getElementById("server-type").value,
+    username: document.getElementById("username").value,
+  };
 
-  //   sendEvent("new_gamer", usernameInput.value);
-  // }
+  fetch("login", {
+    method: "post",
+    headers: {
+      "Content-Type": "application/json",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Credentials": true,
+    },
+    body: JSON.stringify(formData),
+    mode: "cors",
+  })
+    .then((response) => {
+      if (response.ok) {
+        console.log(response);
+        return response.json();
+      } else {
+        throw "Busy!! Try Again.";
+      }
+    })
+    .then((data) => {
+      connectServer(data.username);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
   return false;
 }
+// if (newServer != null && usernameInput != null) {
+//   console.log(`You connected to ${newServer.value} server`);
 
-window.onload = function () {
-  document.getElementById("server-selection").onsubmit = changeServer;
+//   sendEvent(
+//     "new_gamer",
+//     `${usernameInput.value} connected to ${newServer.value} server`
+//   );
+// }
+// if (usernameInput != null) {
+//   console.log(usernameInput.value);
 
+//   sendEvent("new_gamer", usernameInput.value);
+// }
+
+function connectServer(gamer) {
   if (window["WebSocket"]) {
     console.log("Supported");
-
-    conn = new WebSocket("ws://" + document.location.host + "/ws");
+    console.log(gamer);
+    conn = new WebSocket("wss://" + document.location.host + "/ws");
+    //conn = new WebSocket("wss://" + document.location.host + "/ws");
     conn.onmessage = function (evt) {
-      console.log(evt);
+      const data = JSON.parse(evt.data);
+      const event = Object.assign(new gameEvent(), data);
+
+      actionEvent(event);
     };
   } else {
     alert("Web Sockets Unsupported :(");
   }
+}
+
+window.onload = function () {
+  document.getElementById("server-selection").onsubmit = changeServer;
 };
