@@ -496,9 +496,6 @@ function sendEvent(eventName, payload) {
 }
 
 function changeServer() {
-  //const newServer = document.getElementById("server-type");
-  //const usernameInput = document.getElementById("username");
-
   let formData = {
     workingserver: document.getElementById("server-type").value,
     username: document.getElementById("username").value,
@@ -530,19 +527,6 @@ function changeServer() {
     });
   return false;
 }
-// if (newServer != null && usernameInput != null) {
-//   console.log(`You connected to ${newServer.value} server`);
-
-//   sendEvent(
-//     "new_gamer",
-//     `${usernameInput.value} connected to ${newServer.value} server`
-//   );
-// }
-// if (usernameInput != null) {
-//   console.log(usernameInput.value);
-
-//   sendEvent("new_gamer", usernameInput.value);
-// }
 
 function connectServer(gamer) {
   if (window["WebSocket"]) {
@@ -564,3 +548,17 @@ function connectServer(gamer) {
 window.onload = function () {
   document.getElementById("server-selection").onsubmit = changeServer;
 };
+
+// if (newServer != null && usernameInput != null) {
+//   console.log(`You connected to ${newServer.value} server`);
+
+//   sendEvent(
+//     "new_gamer",
+//     `${usernameInput.value} connected to ${newServer.value} server`
+//   );
+// }
+// if (usernameInput != null) {
+//   console.log(usernameInput.value);
+
+//   sendEvent("new_gamer", usernameInput.value);
+// }

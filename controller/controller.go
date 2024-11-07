@@ -18,10 +18,10 @@ import (
 // }
 
 type ButtonClick struct {
+	Id    int    `json:"id"`
 	Color string `json:"color"`
 	Note  string `json:"note"`
 	Key   string `json:"key"`
-	Id    int    `json:"id"`
 	FromPlayer bool `json:"fromPlayer"`
 }
 
@@ -31,7 +31,7 @@ type GameState struct {
 	IsLocked   bool         `json:"isLocked"`    // Whether pattern is locked
 	Score      int          `json:"score"`       // Player's score
 	PlayerClicksLeft   int `json:"playerClicksLeft"` 
-	Mu         sync.RWMutex
+	sync.RWMutex
 }
 
 var Game = &GameState{
@@ -54,13 +54,13 @@ func GetPattern(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	Game.Mu.RLock()
-	defer Game.Mu.RUnlock()
+	Game.RLock()
+	defer Game.RUnlock()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
 		"pattern": Game.Pattern,
-		"PlayerTurn": Game.PlayerTurn,
+		"playerTurn": Game.PlayerTurn,
 		"score":   Game.Score,
 		"playerClicksLeft": Game.PlayerClicksLeft,
 		"isLocked": Game.IsLocked,

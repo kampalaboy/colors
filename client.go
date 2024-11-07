@@ -18,14 +18,16 @@ type GamerList map[*Gamer]bool
 type Gamer struct {
 	connection *websocket.Conn
 	handler *Handler
-	broadcast	chan GameEvent
+	broadcast	chan []byte
+	events  chan GameEvent
 }
 
 func NewGamer(conn *websocket.Conn, handler *Handler) *Gamer {
 	return &Gamer{
 		connection: conn,
 		handler: handler,
-		broadcast: make(chan GameEvent),
+		broadcast: make(chan []byte),
+		events: make(chan GameEvent),
 	}
 }
 
@@ -72,7 +74,7 @@ func (g *Gamer) WriteMessages(){
 	ticker := time.NewTicker(pingInterval)
 	for{
 		select{
-		case message, ok := <- g.broadcast:
+		case message, ok := <- g.events:
 			if !ok {
 				if err := g.connection.WriteMessage(websocket.CloseMessage, nil); err !=nil{
 					log.Println("socket closed: " ,err )

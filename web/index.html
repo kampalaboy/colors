@@ -13,7 +13,7 @@
         flex-direction: column;
         align-items: center;
         color: teal;
-        padding: 20px;
+        /* padding: 20px; */
         box-sizing: border-box;
       }
 
@@ -53,12 +53,8 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin: 0 auto;
+        /* margin: 0 auto; */
       }
-
-      /* .control-buttons {
-        margin: 1px 0;
-      } */
 
       button {
         padding: 10px 20px;
@@ -94,6 +90,11 @@
         /* margin: 1px 0; */
       }
 
+      canvas {
+        margin-bottom: 10px;
+        padding: 0;
+      }
+
       .instrument-wrapper {
         width: 100%;
         display: flex;
@@ -101,13 +102,13 @@
         padding: 20px 0;
         /* margin-top: auto; */
         position: relative;
-        bottom: 0;
+        /* bottom: 0; */
       }
 
       .instrument-button {
         height: 150px;
         margin: 3px;
-        border: solid black 10px;
+        border: solid black 2px;
       }
 
       @media (max-width: 768px) {
@@ -180,50 +181,13 @@
     <div class="game-container">
       <h1>THE Easiest Game</h1>
 
-      <div id="status">
-        1. Create a pattern with color button (minimum 3 clicks)<br />
-        2. Lock the pattern<br />
-        3. Play the pattern on the piano for points<br /><br />
-        Make pattern as long as you like. Longer pattern matching means more
-        points!!
-      </div>
-      <div style="display: flex">
-        <div id="score"></div>
-        <div id="clicks"></div>
-      </div>
+      <canvas id="musicSheet" width="400px" height="200px"></canvas>
 
-      <div class="control-buttons">
-        <button id="lockButton" onclick="lockPattern()">Lock Pattern</button>
-        <button id="resetButton" onclick="resetGame()">Reset Game</button>
-      </div>
-
-      <div class="button-wrapper">
-        <button id="color">COLOR</button>
-      </div>
+      <div id="instrument-wrapper" class="instrument-wrapper"></div>
+      <audio id="audio" preload="auto"></audio>
     </div>
 
-    <div id="instrument-wrapper" class="instrument-wrapper"></div>
-    <audio id="audio" preload="auto"></audio>
-
-    <script>
-      // function checkOrientation() {
-      //   const instrumentWrapper = document.getElementById("instrument-wrapper");
-      //   if (window.innerWidth > window.innerHeight) {
-      //     instrumentWrapper.style.display = "flex";
-      //     instrumentWrapper.style.position = "fixed";
-      //     instrumentWrapper.style.justifyContent = "center";
-      //     instrumentWrapper.style.bottom = "0";
-      //     instrumentWrapper.style.padding = "10px";
-      //     instrumentWrapper.style.width = "100%";
-      //   } else {
-      //     instrumentWrapper.style.display = "none";
-      //     alert("Flip the phone to play!");
-      //   }
-      // }
-      // checkOrientation();
-
-      // window.addEventListener("resize", checkOrientation);
-    </script>
+    <script src="js/graphics.js"></script>
     <script src="js/player.js"></script>
   </body>
 </html>

@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"sync"
 )
 
 type GameEvent struct{
@@ -23,6 +24,19 @@ type SendMessageEvent struct{
 	From string `json:"from"`
 }
 
-type ClickButtons struct{
-	
+type ButtonClick struct {
+	Id    int    `json:"id"`
+	Color string `json:"color"`
+	Note  string `json:"note"`
+	Key   string `json:"key"`
+	FromPlayer bool `json:"fromPlayer"`
+}
+
+type GameState struct {
+	Pattern    []ButtonClick `json:"pattern"`    // Random clicks pattern
+	PlayerTurn []ButtonClick `json:"playerTurn"` // Player's attempts
+	IsLocked   bool         `json:"isLocked"`    // Whether pattern is locked
+	Score      int          `json:"score"`       // Player's score
+	PlayerClicksLeft   int `json:"playerClicksLeft"` 
+	Mu         sync.RWMutex
 }

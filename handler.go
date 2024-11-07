@@ -20,6 +20,7 @@ var(
 	}
 )
 
+
 var game = &controller.GameState{
 	Pattern:          make([]controller.ButtonClick, 0),
 	PlayerTurn:       make([]controller.ButtonClick, 0),
@@ -28,13 +29,14 @@ var game = &controller.GameState{
 	PlayerClicksLeft: 0,
 }
 
-
 type Handler struct{
 	gamers GamerList
 	sync.RWMutex
 
 	referees map[string]GameEventHandler
 }
+
+
 
 func NewHandler() *Handler{
 	h:= &Handler{
@@ -47,7 +49,7 @@ func NewHandler() *Handler{
 
 func (h *Handler) setupGameEvents(){
 	h.referees[EventNewGamer] = newGamer
-	//h.referees[EventClick] = newClicks
+	h.referees[EventClick] = newClicks
 }
 
 func newGamer (event GameEvent, g *Gamer)error{
@@ -97,16 +99,20 @@ func (h *Handler) JoinGameServer (w http.ResponseWriter, r *http.Request){
 
 func(h *Handler) handleClickWS(w http.ResponseWriter, r *http.Request) {
 
-		if r.Method != http.MethodPost {
+	if r.Method != http.MethodPost {
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 		return
 	}
-	h.RLock()
-	defer h.RUnlock()
+	h.Lock()
+	defer h.Unlock()
 	
 	var click controller.ButtonClick
+		if err := json.NewDecoder(r.Body).Decode(&click); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
-	log.Print(click.FromPlayer)
+	log.Println(click.FromPlayer)
 	if !click.FromPlayer {
 		game.Pattern = append(game.Pattern, click)
 		game.PlayerClicksLeft++
@@ -134,11 +140,14 @@ func(h *Handler) handleClickWS(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]interface{}{
  		"status":   "success",
  		"score":    game.Score,
  		"isLocked": game.IsLocked,
+		"pattern": game.Pattern,
+		"playerTurn": game.PlayerTurn,
  		"playerClicksLeft": game.PlayerClicksLeft,
 	})
 }
@@ -199,6 +208,8 @@ func checkOrigin(r *http.Request) bool{
 
 	switch origin{
 	case "https://localhost:8080":
+		return true
+	case "https://192.168.0.109:8080":
 		return true
 	default:
 		return false
