@@ -46,7 +46,7 @@
 
       h1 {
         text-align: center;
-        margin: 20px 0;
+        margin: 0;
       }
 
       .game-container {
@@ -55,7 +55,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        /* margin: 0 auto; */
+        gap: 0;
       }
 
       button {
@@ -74,8 +74,9 @@
 
       #status {
         text-align: center;
-        margin: 20px 0;
+        margin: 0;
         line-height: 1.5;
+        padding-bottom: 5px;
       }
 
       #score,
@@ -181,8 +182,8 @@
 
     <div class="game-container">
       <h1>THE Easiest Game</h1>
-
-      <div style="display: flex; align-items: flex-start">
+      <div id="status"></div>
+      <div style="display: flex; align-items: flex-start; margin-top: 0">
         <div
           style="
             height: 160px;

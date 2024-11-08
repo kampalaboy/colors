@@ -28,7 +28,7 @@ class Graphics {
 
   async loadExplosionSound() {
     try {
-      const response = await fetch("./public/cannon.mp3");
+      const response = await fetch("./public/explosion.mp3");
       const arrayBuffer = await response.arrayBuffer();
       this.explosionBuffer = await this.audioContext.decodeAudioData(
         arrayBuffer

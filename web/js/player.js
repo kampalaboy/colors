@@ -141,6 +141,13 @@ function sendEvent(eventName, payload) {
 }
 
 window.onload = function () {
+  const helpfulText = document.getElementById("status");
+  helpfulText.innerHTML = `
+                          1. You may want to play around with the piano</br> 
+                          2. Make explosions for points</br>
+                          3. A little music theory won't hurt 
+                          `;
+
   if (window["WebSocket"]) {
     console.log("Supported");
 

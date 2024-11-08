@@ -78,17 +78,3 @@ function connectServer(gamer) {
 window.onload = function () {
   document.getElementById("server-selection").onsubmit = changeServer;
 };
-
-// if (newServer != null && usernameInput != null) {
-//   console.log(`You connected to ${newServer.value} server`);
-
-//   sendEvent(
-//     "new_gamer",
-//     `${usernameInput.value} connected to ${newServer.value} server`
-//   );
-// }
-// if (usernameInput != null) {
-//   console.log(usernameInput.value);
-
-//   sendEvent("new_gamer", usernameInput.value);
-// }
