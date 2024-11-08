@@ -12,6 +12,10 @@ class Graphics {
 
     this.explosions = []; // Add this to track explosions
 
+    this.shakeIntensity = 0;
+    this.shakeDecay = 0.9; // How quickly the shake settles
+    this.canvasOffset = { x: 0, y: 0 }; // Track shake offset
+
     // Start animation loop
     this.animate();
   }
@@ -51,6 +55,7 @@ class Graphics {
   }
 
   splashColor(color) {
+    console.log("splashColor called from:", new Error().stack); // This will show us where it's being called from
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
     const staffBottom = staffTop + lineSpacing * 4;
@@ -58,12 +63,11 @@ class Graphics {
     const splash = {
       x: Math.random() * this.canvas.width,
       y: staffTop + Math.random() * (staffBottom - staffTop),
-      radius: 10, // Math.random() * 20 + 5,
+      radius: 10,
       opacity: 1,
       color: color,
     };
 
-    console.log("Creating splash:", splash); // Debug log
     this.splashes.push(splash);
   }
 
@@ -160,6 +164,9 @@ class Graphics {
         color: color,
         opacity: 1,
         life: 1, // Add life counter
+        wobble: Math.random() * Math.PI * 2,
+        wobbleSpeed: 0.1 + Math.random() * 0.2,
+        wobbleRadius: 2 + Math.random() * 4,
       });
     }
 
@@ -181,15 +188,52 @@ class Graphics {
           console.log(error);
         });
     }
+
+    // Trigger shake on explosion
+    this.shakeIntensity = 15; // Initial shake intensity
+  }
+
+  updateShake() {
+    if (this.shakeIntensity > 0) {
+      // Create random offset based on intensity
+      this.canvasOffset = {
+        x: (Math.random() - 0.5) * this.shakeIntensity,
+        y: (Math.random() - 0.5) * this.shakeIntensity,
+      };
+
+      // Decay the shake
+      this.shakeIntensity *= this.shakeDecay;
+
+      // Cut off small shakes
+      if (this.shakeIntensity < 0.1) {
+        this.shakeIntensity = 0;
+        this.canvasOffset = { x: 0, y: 0 };
+      }
+    }
   }
 
   // Add animation loop
   animate() {
-    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    // Update shake at start of frame
+    this.updateShake();
+
+    // Apply shake offset to entire canvas
+    this.ctx.save();
+    this.ctx.translate(this.canvasOffset.x, this.canvasOffset.y);
+
+    // Clear and draw everything
+    this.ctx.clearRect(
+      -this.canvasOffset.x,
+      -this.canvasOffset.y,
+      this.canvas.width,
+      this.canvas.height
+    );
+
     this.drawMusicSheet();
 
     // Draw splashes first
     console.log("Current splashes:", this.splashes.length); // Debug log
+    console.log("Current explosions:", this.explosions.length);
     this.splashes = this.splashes.filter((splash) => {
       splash.opacity -= 0.02;
 
@@ -209,11 +253,21 @@ class Graphics {
 
     // Draw explosions
     this.explosions = this.explosions.filter((explosion) => {
+      // Debug log
       explosion.age++;
 
       explosion.particles = explosion.particles.filter((particle) => {
-        particle.x += particle.vx;
-        particle.y += particle.vy;
+        // Update particle position with wobble
+        particle.wobble += particle.wobbleSpeed;
+
+        // Add wobble to velocity
+        particle.x +=
+          particle.vx + Math.cos(particle.wobble) * particle.wobbleRadius * 0.1;
+        particle.y +=
+          particle.vy + Math.sin(particle.wobble) * particle.wobbleRadius * 0.1;
+
+        particle.vx += (Math.random() - 0.5) * 0.3;
+        particle.vy += (Math.random() - 0.5) * 0.3;
         particle.opacity -= 0.05;
         particle.life -= 0.05;
 
@@ -224,7 +278,13 @@ class Graphics {
         this.ctx.globalAlpha = particle.opacity;
         this.ctx.shadowColor = particle.color;
         this.ctx.shadowBlur = 5 * particle.opacity;
-        this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        this.ctx.arc(
+          particle.x,
+          particle.y,
+          particle.radius * (1 + Math.sin(particle.wobble) * 0.2),
+          0,
+          Math.PI * 2
+        );
         this.ctx.fill();
         this.ctx.globalAlpha = 1; // Reset alpha after each particle
 
@@ -248,7 +308,7 @@ class Graphics {
           // Remove collided bullet
           this.bulletStream.splice(bulletIndex, 1);
 
-          // Reset splash opacity
+          // Instead of creating new splash, just reset opacity of existing one
           splash.opacity = 1;
         }
       });
@@ -256,6 +316,9 @@ class Graphics {
 
     // Continue with bullets
     this.streamBullets();
+
+    // Reset canvas transform
+    this.ctx.restore();
 
     requestAnimationFrame(() => this.animate());
   }
