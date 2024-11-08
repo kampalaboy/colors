@@ -211,6 +211,8 @@ func checkOrigin(r *http.Request) bool{
 		return true
 	case "https://192.168.0.109:8080":
 		return true
+	case "https://192.168.43.54:8080":
+		return true
 	default:
 		return false
 	}

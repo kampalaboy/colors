@@ -8,7 +8,7 @@ import (
 
 func main(){
 	connectHttpServer()
-	port := ":8080"
+	port := "192.168.0.109:8080" // 192.168.43.54 
 	log.Printf("Started on %s", port)
 	//log.Fatal(http.ListenAndServe(port, nil ))
 	log.Fatal(http.ListenAndServeTLS(port, "game.crt", "game.key", nil ))
