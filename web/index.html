@@ -79,6 +79,12 @@
         padding-bottom: 5px;
       }
 
+      .instrument-button {
+        height: 150px;
+        margin: 3px;
+        border: solid black 2px;
+      }
+
       #score,
       #clicks {
         font-size: 50px;
@@ -90,7 +96,6 @@
         width: 100%;
         display: flex;
         justify-content: center;
-        /* margin: 1px 0; */
       }
 
       canvas {
@@ -105,12 +110,6 @@
         bottom: 0;
         padding: 10px;
         width: 100%;
-      }
-
-      .instrument-button {
-        height: 150px;
-        margin: 3px;
-        border: solid black 2px;
       }
 
       @media (max-width: 768px) {
@@ -151,14 +150,12 @@
         }
 
         .instrument-wrapper {
-          width: calc(100% - 20px);
+          width: calc(100% - 100px);
           padding: 10px;
           margin: 0 10px;
-          overflow-x: auto;
           -webkit-overflow-scrolling: touch;
         }
 
-        /* Optional: Add smooth scrolling for touch devices */
         .instrument-wrapper::-webkit-scrollbar {
           height: 4px;
         }
@@ -217,7 +214,7 @@
         <canvas
           id="musicSheet"
           width="350"
-          height="200"
+          height="216"
           style="display: block; margin: 0"
         ></canvas>
       </div>

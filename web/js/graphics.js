@@ -17,8 +17,7 @@ class Graphics {
     this.canvasOffset = { x: 0, y: 0 }; // Track shake offset
 
     // Setup Web Audio API
-    this.audioContext = new (window.AudioContext ||
-      window.webkitAudioContext)();
+    this.audioContext = new window.AudioContext();
     this.explosionBuffer = null;
     this.loadExplosionSound();
 
@@ -62,7 +61,7 @@ class Graphics {
 
     // Draw 5 music sheet lines
     this.ctx.strokeStyle = "#000";
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 8; i++) {
       const y = startY + i * lineSpacing;
       this.ctx.beginPath();
       this.ctx.moveTo(0, y); // Start from left edge
@@ -92,7 +91,7 @@ class Graphics {
     console.log("splashColor called from:", new Error().stack); // This will show us where it's being called from
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
-    const staffBottom = staffTop + lineSpacing * 8;
+    const staffBottom = staffTop + lineSpacing * 7;
 
     const splash = {
       x: Math.random() * this.canvas.width,
@@ -110,22 +109,22 @@ class Graphics {
         splash.y = staffBottom;
         break;
       case "D":
-        splash.y = staffTop + lineSpacing * 7;
-        break;
-      case "E":
         splash.y = staffTop + lineSpacing * 6;
         break;
-      case "F":
+      case "E":
         splash.y = staffTop + lineSpacing * 5;
         break;
-      case "G":
+      case "F":
         splash.y = staffTop + lineSpacing * 4;
         break;
-      case "A":
+      case "G":
         splash.y = staffTop + lineSpacing * 3;
         break;
-      case "B":
+      case "A":
         splash.y = staffTop + lineSpacing * 2;
+        break;
+      case "B":
+        splash.y = staffTop + lineSpacing;
         break;
     }
     this.splashes.push(splash);
@@ -135,15 +134,9 @@ class Graphics {
   createFallingNote(note, key, color) {
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
-    const staffBottom = staffTop + lineSpacing * 8;
-    // Calculate positions for top 3 lines
-    // const startLines = [
-    //   staffTop, // First line
-    //   staffTop + lineSpacing, // Second line
-    //   staffTop + lineSpacing * 2, // Third line
-    // ];
+    //const staffBottom = staffTop + lineSpacing * 8;
 
-    const startY = startLines[Math.floor(Math.random() * startLines.length)];
+    //const startY = startLines[Math.floor(Math.random() * startLines.length)];
 
     const noteObj = {
       note: note,
@@ -379,6 +372,6 @@ class Graphics {
   drawNoteOnPress(note, key, color) {
     console.log("Drawing note with color:", color); // Debug log
     this.splashColor(color, note);
-    this.createFallingNote(note, key, color);
+    //this.createFallingNote(note, key, color);
   }
 }
