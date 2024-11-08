@@ -1,14 +1,14 @@
 //Data for the game
 
 const backgrounds = [
-  { id: 0, color: "black", note: "./public/S.mp3", key: " " },
-  { id: 1, color: "red", note: "./public/C.mp3", key: "a" },
-  { id: 2, color: "orange", note: "./public/D.mp3", key: "s" },
-  { id: 3, color: "yellow", note: "./public/E.mp3", key: "d" },
-  { id: 4, color: "green", note: "./public/F.mp3", key: "f" },
-  { id: 5, color: "blue", note: "./public/G.mp3", key: "g" },
-  { id: 6, color: "indigo", note: "./public/A.mp3", key: "h" },
-  { id: 7, color: "violet", note: "./public/B.mp3", key: "j" },
+  { id: 0, color: "black", note: "./public/S.mp3", key: " ", musicNote: "Dr" },
+  { id: 1, color: "red", note: "./public/C.mp3", key: "a", musicNote: "C" },
+  { id: 2, color: "orange", note: "./public/D.mp3", key: "s", musicNote: "D" },
+  { id: 3, color: "yellow", note: "./public/E.mp3", key: "d", musicNote: "E" },
+  { id: 4, color: "green", note: "./public/F.mp3", key: "f", musicNote: "F" },
+  { id: 5, color: "blue", note: "./public/G.mp3", key: "g", musicNote: "G" },
+  { id: 6, color: "indigo", note: "./public/A.mp3", key: "h", musicNote: "A" },
+  { id: 7, color: "violet", note: "./public/B.mp3", key: "j", musicNote: "B" },
 ];
 
 // Controls for the game
@@ -70,7 +70,7 @@ function playInstrument() {
         };
 
         sendEvent("new_clicks", clickData);
-        graphics.drawNoteOnPress(b.note, b.key, b.color);
+        graphics.drawNoteOnPress(b.musicNote, b.key, b.color);
       }
     };
     instrumentButton.addEventListener("mousedown", () => {

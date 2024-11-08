@@ -88,20 +88,46 @@ class Graphics {
     console.log(`Playing note: ${note}, at position (${x}, ${y})`);
   }
 
-  splashColor(color) {
+  splashColor(color, note) {
     console.log("splashColor called from:", new Error().stack); // This will show us where it's being called from
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
-    const staffBottom = staffTop + lineSpacing * 4;
+    const staffBottom = staffTop + lineSpacing * 8;
 
     const splash = {
       x: Math.random() * this.canvas.width,
-      y: staffTop + Math.random() * (staffBottom - staffTop),
+      y: 0, //staffTop + Math.random() * (staffBottom - staffTop),
       radius: 10,
       opacity: 1,
       color: color,
+      note: note,
     };
-
+    switch (note) {
+      case "Dr":
+        splash.y = staffTop;
+        break;
+      case "C":
+        splash.y = staffBottom;
+        break;
+      case "D":
+        splash.y = staffTop + lineSpacing * 7;
+        break;
+      case "E":
+        splash.y = staffTop + lineSpacing * 6;
+        break;
+      case "F":
+        splash.y = staffTop + lineSpacing * 5;
+        break;
+      case "G":
+        splash.y = staffTop + lineSpacing * 4;
+        break;
+      case "A":
+        splash.y = staffTop + lineSpacing * 3;
+        break;
+      case "B":
+        splash.y = staffTop + lineSpacing * 2;
+        break;
+    }
     this.splashes.push(splash);
   }
 
@@ -109,26 +135,58 @@ class Graphics {
   createFallingNote(note, key, color) {
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
-
+    const staffBottom = staffTop + lineSpacing * 8;
     // Calculate positions for top 3 lines
-    const startLines = [
-      staffTop, // First line
-      staffTop + lineSpacing, // Second line
-      staffTop + lineSpacing * 2, // Third line
-    ];
+    // const startLines = [
+    //   staffTop, // First line
+    //   staffTop + lineSpacing, // Second line
+    //   staffTop + lineSpacing * 2, // Third line
+    // ];
 
     const startY = startLines[Math.floor(Math.random() * startLines.length)];
 
     const noteObj = {
       note: note,
       x: 50 + key.charCodeAt(0) * 10,
-      y: startY,
+      y: 0, //startY,
       currentLine: Math.floor((startY - staffTop) / lineSpacing),
       progress: 0, // Progress through current arc (0 to 1)
       radius: 10,
       color: color,
       active: true,
     };
+
+    switch (noteObj.y) {
+      case note:
+        "C";
+        noteObj.y = staffBottom;
+        break;
+      case note:
+        "D";
+        noteObj.y = staffTop + lineSpacing * 7;
+        break;
+      case note:
+        "E";
+        noteObj.y = staffTop + lineSpacing * 6;
+        break;
+      case note:
+        "F";
+        noteObj.y = staffTop + lineSpacing * 5;
+        break;
+      case note:
+        "G";
+        noteObj.y = staffTop + lineSpacing * 4;
+        break;
+      case note:
+        "A";
+        noteObj.y = staffTop + lineSpacing * 3;
+        break;
+      case note:
+        "B";
+        noteObj.y = staffTop + lineSpacing * 2;
+        break;
+    }
+
     this.fallingNotes.push(noteObj);
   }
 
@@ -149,6 +207,7 @@ class Graphics {
         { min: staffTop + lineSpacing * 4, max: staffTop + lineSpacing * 5 }, // Between lines 5-6
         { min: staffTop + lineSpacing * 5, max: staffTop + lineSpacing * 6 }, // Between lines 6-7
         { min: staffTop + lineSpacing * 6, max: staffTop + lineSpacing * 7 }, // Between line 7-8
+        { min: staffTop + lineSpacing * 7, max: staffTop + lineSpacing * 8 }, // Between line 7-8
       ];
 
       // Randomly choose a gap between staff lines
@@ -350,7 +409,7 @@ class Graphics {
   // Modify drawNoteOnPress to create both a splash and a falling note
   drawNoteOnPress(note, key, color) {
     console.log("Drawing note with color:", color); // Debug log
-    this.splashColor(color);
+    this.splashColor(color, note);
     this.createFallingNote(note, key, color);
   }
 }
