@@ -35,8 +35,8 @@ function playInstrument() {
     const player = async (buttonData) => {
       if (b.note) {
         instrumentButton.style.backgroundColor = b.color;
-
-        audioElement.src = b.note;
+        const audioSrc = b.note;
+        audioElement.src = audioSrc;
         var currentAudio = audioElement.play();
 
         if (currentAudio !== undefined) {

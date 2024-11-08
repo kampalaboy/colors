@@ -176,7 +176,8 @@ class Graphics {
     });
 
     const audioExplosion = document.getElementById("audio");
-    audioExplosion.src = "./public/cannon.mp3";
+    const audioSrc = "./public/cannon.mp3";
+    audioExplosion.src = audioSrc;
 
     var explosionAudio = audioExplosion.play();
     if (explosionAudio !== undefined) {
