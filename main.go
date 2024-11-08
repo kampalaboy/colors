@@ -12,8 +12,8 @@ func main(){
 	port := "8080"
 	//port := "192.168.0.109:8080" // 192.168.43.54 
 	log.Printf("Started on %s", port)
-	//log.Fatal(http.ListenAndServe(port, nil ))
-	log.Fatal(http.ListenAndServeTLS("0.0.0.0:"+port, "game.crt", "game.key", nil ))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+port, nil ))
+	//log.Fatal(http.ListenAndServeTLS("0.0.0.0:"+port, "game.crt", "game.key", nil ))
 
 	//wifiIP := "localhost:3000"
 	

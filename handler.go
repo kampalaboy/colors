@@ -209,8 +209,6 @@ func checkOrigin(r *http.Request) bool{
 	switch origin{
 	case "https://localhost:8080":
 		return true
-	case "0.0.0.0:80":
-		return true
 	default:
 		return false
 	}
