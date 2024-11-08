@@ -1,3 +1,8 @@
+colors.crt
+colors.key
+key.pem
+cert.pem
+
 game.crt
 game.key
 gencert.bash
