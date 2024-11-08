@@ -156,37 +156,6 @@ class Graphics {
       active: true,
     };
 
-    switch (noteObj.y) {
-      case note:
-        "C";
-        noteObj.y = staffBottom;
-        break;
-      case note:
-        "D";
-        noteObj.y = staffTop + lineSpacing * 7;
-        break;
-      case note:
-        "E";
-        noteObj.y = staffTop + lineSpacing * 6;
-        break;
-      case note:
-        "F";
-        noteObj.y = staffTop + lineSpacing * 5;
-        break;
-      case note:
-        "G";
-        noteObj.y = staffTop + lineSpacing * 4;
-        break;
-      case note:
-        "A";
-        noteObj.y = staffTop + lineSpacing * 3;
-        break;
-      case note:
-        "B";
-        noteObj.y = staffTop + lineSpacing * 2;
-        break;
-    }
-
     this.fallingNotes.push(noteObj);
   }
 
