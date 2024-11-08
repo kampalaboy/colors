@@ -3,12 +3,14 @@ class Graphics {
     this.sheet = sheet;
     this.canvas = document.getElementById("musicSheet");
     this.ctx = this.canvas.getContext("2d");
-
+    this.bulletStream = [];
     this.splashes = []; // Add this to track active splashes
 
     this.fallingNotes = []; // Track active falling notes
     this.gravity = 0.2; // Gravity constant
     this.bounce = 0.6; // Bounce dampening (0-1)
+
+    this.explosions = []; // Add this to track explosions
 
     // Start animation loop
     this.animate();
@@ -49,52 +51,20 @@ class Graphics {
   }
 
   splashColor(color) {
-    // Calculate staff boundaries
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
     const staffBottom = staffTop + lineSpacing * 4;
 
-    // Create new splash within staff boundaries
     const splash = {
       x: Math.random() * this.canvas.width,
-      y: staffTop + Math.random() * (staffBottom - staffTop), // Constrain to staff area
-      radius: 10,
+      y: staffTop + Math.random() * (staffBottom - staffTop),
+      radius: 10, // Math.random() * 20 + 5,
       opacity: 1,
       color: color,
     };
 
+    console.log("Creating splash:", splash); // Debug log
     this.splashes.push(splash);
-
-    const animateGlow = () => {
-      this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-      this.drawMusicSheet(); // Redraw the music sheet lines
-
-      // Update and draw each splash
-      this.splashes = this.splashes.filter((splash) => {
-        splash.opacity -= 0.02; // Adjust fade speed
-
-        if (splash.opacity <= 0) return false; // Remove completely faded splashes
-
-        this.ctx.beginPath();
-        this.ctx.fillStyle = `${splash.color}${Math.floor(splash.opacity * 255)
-          .toString(16)
-          .padStart(2, "0")}`;
-        this.ctx.shadowColor = splash.color;
-        this.ctx.shadowBlur = 15 * splash.opacity; // Blur fades with opacity
-        this.ctx.arc(splash.x, splash.y, splash.radius, 0, Math.PI * 2, false);
-        this.ctx.fill();
-
-        return true;
-      });
-
-      // Continue animation if there are active splashes
-      if (this.splashes.length > 0) {
-        requestAnimationFrame(animateGlow);
-      }
-    };
-
-    // Start animation loop
-    animateGlow();
   }
 
   // Add new method to create falling notes
@@ -124,79 +94,176 @@ class Graphics {
     this.fallingNotes.push(noteObj);
   }
 
+  // Random Bullets coming from right to left
+  streamBullets() {
+    // Create new bullets periodically
+    if (Math.random() < 0.1) {
+      // Adjust probability to control bullet density
+      const staffTop = this.canvas.height / 3;
+      const lineSpacing = this.canvas.height / 12;
+
+      // Calculate spaces between the 5 staff lines
+      const gaps = [
+        { min: staffTop, max: staffTop + lineSpacing }, // Between lines 1-2
+        { min: staffTop + lineSpacing, max: staffTop + lineSpacing * 2 }, // Between lines 2-3
+        { min: staffTop + lineSpacing * 2, max: staffTop + lineSpacing * 3 }, // Between lines 3-4
+        { min: staffTop + lineSpacing * 3, max: staffTop + lineSpacing * 4 }, // Between lines 4-5
+        { min: staffTop + lineSpacing * 4, max: staffTop + lineSpacing * 5 }, // Between lines 5-6
+        { min: staffTop + lineSpacing * 5, max: staffTop + lineSpacing * 6 }, // Between lines 6-7
+        { min: staffTop + lineSpacing * 6, max: staffTop + lineSpacing * 7 }, // Between line 7-8
+      ];
+
+      // Randomly choose a gap between staff lines
+      const gap = gaps[Math.floor(Math.random() * gaps.length)];
+
+      const bullet = {
+        x: this.canvas.width, // Start from right
+        y: gap.min + Math.random() * (gap.max - gap.min), // Random position in chosen gap
+        speed: 2 + Math.random() * 2, // Random speed
+        radius: 2,
+      };
+
+      this.bulletStream.push(bullet);
+    }
+
+    // Update and draw bullets
+    this.bulletStream = this.bulletStream.filter((bullet) => {
+      // Move bullet left
+      bullet.x -= bullet.speed;
+
+      // Draw bullet
+      this.ctx.beginPath();
+      this.ctx.arc(bullet.x, bullet.y, bullet.radius, 0, 2 * Math.PI);
+      this.ctx.fillStyle = "black";
+      this.ctx.fill();
+      this.ctx.closePath();
+
+      // Keep bullet if still on screen
+      return bullet.x > -bullet.radius;
+    });
+  }
+
+  createExplosion(x, y, color) {
+    const particleCount = 20;
+    const particles = [];
+
+    for (let i = 0; i < particleCount; i++) {
+      const angle = (Math.PI * 2 * i) / particleCount;
+      const speed = 2 + Math.random() * 3;
+
+      particles.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        radius: 3 + Math.random() * 3,
+        color: color,
+        opacity: 1,
+        life: 1, // Add life counter
+      });
+    }
+
+    this.explosions.push({
+      particles: particles,
+      age: 0,
+    });
+
+    const audioExplosion = document.getElementById("audio");
+    audioExplosion.src = "./public/cannon.mp3";
+
+    var explosionAudio = audioExplosion.play();
+    if (explosionAudio !== undefined) {
+      explosionAudio
+        .then((_) => {
+          explosionAudio;
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
+  }
+
   // Add animation loop
   animate() {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     this.drawMusicSheet();
 
     // Draw splashes first
+    console.log("Current splashes:", this.splashes.length); // Debug log
     this.splashes = this.splashes.filter((splash) => {
       splash.opacity -= 0.02;
 
       if (splash.opacity <= 0) return false;
 
       this.ctx.beginPath();
-      this.ctx.fillStyle = `${splash.color}${Math.floor(splash.opacity * 255)
-        .toString(16)
-        .padStart(2, "0")}`;
+      this.ctx.fillStyle = splash.color;
+      this.ctx.globalAlpha = splash.opacity;
       this.ctx.shadowColor = splash.color;
-      this.ctx.shadowBlur = 15 * splash.opacity;
-      this.ctx.arc(splash.x, splash.y, splash.radius, 0, Math.PI * 2, false);
+      this.ctx.shadowBlur = 10 * splash.opacity;
+      this.ctx.arc(splash.x, splash.y, splash.radius, 0, Math.PI * 2);
       this.ctx.fill();
+      this.ctx.globalAlpha = 1; // Reset alpha
 
       return true;
     });
 
-    const staffTop = this.canvas.height / 3;
-    const lineSpacing = this.canvas.height / 12;
+    // Draw explosions
+    this.explosions = this.explosions.filter((explosion) => {
+      explosion.age++;
 
-    // Then draw falling notes
-    this.fallingNotes.forEach((note) => {
-      // Update progress
-      note.progress += 0.05; // Controls speed of movement
+      explosion.particles = explosion.particles.filter((particle) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.opacity -= 0.05;
+        particle.life -= 0.05;
 
-      if (note.progress >= 1) {
-        // Move to next line
-        note.currentLine++;
-        note.progress = 0;
-        // Create splash when landing on a line
-        this.splashColor(note.color);
-      }
+        if (particle.life <= 0) return false;
 
-      // Calculate current and next line y-positions
-      const currentLineY = staffTop + note.currentLine * lineSpacing;
-      const nextLineY = currentLineY + lineSpacing;
+        this.ctx.beginPath();
+        this.ctx.fillStyle = particle.color;
+        this.ctx.globalAlpha = particle.opacity;
+        this.ctx.shadowColor = particle.color;
+        this.ctx.shadowBlur = 5 * particle.opacity;
+        this.ctx.arc(particle.x, particle.y, particle.radius, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.globalAlpha = 1; // Reset alpha after each particle
 
-      // Create parabolic arc between lines
-      const t = note.progress;
-      const arcHeight = lineSpacing * 0.3; // Maximum height of the arc
+        return true;
+      });
 
-      // Parabolic interpolation
-      note.y =
-        currentLineY +
-        t * lineSpacing + // Linear movement down
-        -4 * arcHeight * t * (t - 1); // Parabolic arc
-
-      // Draw the note
-      this.ctx.beginPath();
-      this.ctx.arc(note.x, note.y, note.radius, 0, 2 * Math.PI);
-      this.ctx.fillStyle = note.color;
-      this.ctx.fill();
-      this.ctx.closePath();
+      return explosion.particles.length > 0 && explosion.age < 60;
     });
 
-    // Clean up notes that have passed the last line
-    const lastLineY = staffTop + lineSpacing * 4;
-    this.fallingNotes = this.fallingNotes.filter(
-      (note) => note.currentLine < 5 // Remove after passing last line
-    );
+    // Check collisions between bullets and splashes
+    this.bulletStream.forEach((bullet, bulletIndex) => {
+      this.splashes.forEach((splash, splashIndex) => {
+        const dx = bullet.x - splash.x;
+        const dy = bullet.y - splash.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < bullet.radius + splash.radius) {
+          // Collision detected! Create explosion
+          this.createExplosion(bullet.x, bullet.y, splash.color);
+
+          // Remove collided bullet
+          this.bulletStream.splice(bulletIndex, 1);
+
+          // Reset splash opacity
+          splash.opacity = 1;
+        }
+      });
+    });
+
+    // Continue with bullets
+    this.streamBullets();
 
     requestAnimationFrame(() => this.animate());
   }
 
   // Modify drawNoteOnPress to create both a splash and a falling note
   drawNoteOnPress(note, key, color) {
-    //this.splashColor(color);
+    console.log("Drawing note with color:", color); // Debug log
+    this.splashColor(color);
     this.createFallingNote(note, key, color);
   }
 }

@@ -351,18 +351,17 @@ function playInstrument() {
 
         //await currentAudio;
         sendEvent("new_clicks", clickData);
+        graphics.drawNoteOnPress(b.note, b.key, b.color);
         //sendClickData(buttonData, true);
       }
     };
     instrumentButton.addEventListener("mousedown", () => {
       player(b);
-      graphics.drawNoteOnPress(b.note, b.key, b.color);
     });
     instrumentButton.addEventListener(
       "touchstart",
       () => {
         player(b);
-        graphics.drawNoteOnPress(b.note, b.key, b.color);
       },
       { passive: false }
     );
@@ -370,7 +369,6 @@ function playInstrument() {
       console.log(event);
       if (event.key === b.key && !event.repeat) {
         player(b);
-        graphics.drawNoteOnPress(b.note, b.key, b.color);
       }
     });
     instrumentButton.addEventListener("mouseup", () => {
