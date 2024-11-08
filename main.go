@@ -8,10 +8,10 @@ import (
 
 func main(){
 	connectHttpServer()
-	port := ":8080"
+	port := "8080"
 	log.Printf("Started on %s", port)
 	//log.Fatal(http.ListenAndServe(port, nil ))
-	log.Fatal(http.ListenAndServeTLS(port, "game.crt", "game.key", nil ))
+	log.Fatal(http.ListenAndServeTLS("0.0.0.0:"+port, "game.crt", "game.key", nil ))
 
 	//wifiIP := "localhost:3000"
 	
