@@ -34,6 +34,10 @@ func connectHttpServer(){
 	http.HandleFunc("/api/click", handler.handleClickWS)
 	http.HandleFunc("/api/pattern", controller.GetPattern)
 
+	http.HandleFunc("/code", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "./web/code.html")
+	})
+
 	http.HandleFunc("/multiplayer", func(w http.ResponseWriter, r *http.Request) {
 	http.ServeFile(w, r, "./web/multiplayer.html")
 	})
