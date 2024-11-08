@@ -314,7 +314,21 @@ const lockButton = document.getElementById("lockButton");
 const statusText = document.getElementById("status");
 const graphics = new Graphics([]);
 
+// Create and preload audio elements for each note
+const audioElements = {};
+
+function preloadAudioElements() {
+  backgrounds.forEach((b) => {
+    const audio = new Audio();
+    audio.src = b.note;
+    audio.preload = "auto";
+    audioElements[b.note] = audio;
+  });
+}
+
 function playInstrument() {
+  preloadAudioElements();
+
   backgrounds.forEach((b, index) => {
     const instrumentButton = document.createElement("button");
     instrument.appendChild(instrumentButton);
@@ -328,19 +342,17 @@ function playInstrument() {
       if (b.note) {
         instrumentButton.style.backgroundColor = b.color;
 
-        audioElement.src = b.note;
-        var currentAudio = audioElement.play();
+        // Use the preloaded audio element
+        const audio = audioElements[b.note];
+        audio.currentTime = 0; // Reset playback position
+        var currentAudio = audio.play();
 
         if (currentAudio !== undefined) {
-          currentAudio
-            .then((_) => {
-              currentAudio;
-              //audioElement.pause();
-            })
-            .catch((error) => {
-              console.log(error);
-            });
+          currentAudio.catch((error) => {
+            console.log(error);
+          });
         }
+
         const clickData = {
           id: b.id,
           note: b.note,
@@ -349,10 +361,8 @@ function playInstrument() {
           fromPlayer: true,
         };
 
-        //await currentAudio;
         sendEvent("new_clicks", clickData);
         graphics.drawNoteOnPress(b.note, b.key, b.color);
-        //sendClickData(buttonData, true);
       }
     };
     instrumentButton.addEventListener("mousedown", () => {
