@@ -16,8 +16,42 @@ class Graphics {
     this.shakeDecay = 0.9; // How quickly the shake settles
     this.canvasOffset = { x: 0, y: 0 }; // Track shake offset
 
+    // Setup Web Audio API
+    this.audioContext = new (window.AudioContext ||
+      window.webkitAudioContext)();
+    this.explosionBuffer = null;
+    this.loadExplosionSound();
+
     // Start animation loop
     this.animate();
+  }
+
+  async loadExplosionSound() {
+    try {
+      const response = await fetch("./public/cannon.mp3");
+      const arrayBuffer = await response.arrayBuffer();
+      this.explosionBuffer = await this.audioContext.decodeAudioData(
+        arrayBuffer
+      );
+    } catch (error) {
+      console.error("Error loading explosion sound:", error);
+    }
+  }
+
+  playExplosionSound() {
+    if (!this.explosionBuffer) return;
+
+    const source = this.audioContext.createBufferSource();
+    source.buffer = this.explosionBuffer;
+
+    // Add volume control
+    const gainNode = this.audioContext.createGain();
+    gainNode.gain.value = 0.5; // Adjust volume as needed
+
+    source.connect(gainNode);
+    gainNode.connect(this.audioContext.destination);
+
+    source.start(0);
   }
 
   drawMusicSheet() {
@@ -152,7 +186,8 @@ class Graphics {
     const particles = [];
 
     for (let i = 0; i < particleCount; i++) {
-      const angle = (Math.PI * 2 * i) / particleCount;
+      const angle =
+        (Math.PI * 2 * i) / particleCount + (Math.random() - 0.5) * 0.5;
       const speed = 2 + Math.random() * 3;
 
       particles.push({
@@ -163,7 +198,7 @@ class Graphics {
         radius: 3 + Math.random() * 3,
         color: color,
         opacity: 1,
-        life: 1, // Add life counter
+        life: 1,
         wobble: Math.random() * Math.PI * 2,
         wobbleSpeed: 0.1 + Math.random() * 0.2,
         wobbleRadius: 2 + Math.random() * 4,
@@ -175,23 +210,11 @@ class Graphics {
       age: 0,
     });
 
-    const audioExplosion = document.getElementById("audio");
-    const audioSrc = "./public/cannon.mp3";
-    audioExplosion.src = audioSrc;
+    // Play explosion sound using pool
+    this.playExplosionSound();
 
-    var explosionAudio = audioExplosion.play();
-    if (explosionAudio !== undefined) {
-      explosionAudio
-        .then((_) => {
-          explosionAudio;
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-    }
-
-    // Trigger shake on explosion
-    this.shakeIntensity = 15; // Initial shake intensity
+    // Trigger shake
+    this.shakeIntensity = 15;
   }
 
   updateShake() {
