@@ -312,7 +312,7 @@ const scoreElement = document.getElementById("score");
 const clicksElement = document.getElementById("clicks");
 const lockButton = document.getElementById("lockButton");
 const statusText = document.getElementById("status");
-const graphics = new Graphics([], "", "");
+const graphics = new Graphics([]);
 
 function playInstrument() {
   backgrounds.forEach((b, index) => {

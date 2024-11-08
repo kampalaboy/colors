@@ -4,11 +4,17 @@ class Graphics {
     this.canvas = document.getElementById("musicSheet");
     this.ctx = this.canvas.getContext("2d");
 
+    this.glowBlur = "";
+    this.glowIncreasing = true;
+
     this.splashes = []; // Add this to track active splashes
 
     this.fallingNotes = []; // Track active falling notes
     this.gravity = 0.2; // Gravity constant
     this.bounce = 0.6; // Bounce dampening (0-1)
+
+    // Draw initial music sheet lines
+    this.drawMusicSheet();
 
     // Start animation loop
     this.animate();
@@ -58,7 +64,7 @@ class Graphics {
     const splash = {
       x: Math.random() * this.canvas.width,
       y: staffTop + Math.random() * (staffBottom - staffTop), // Constrain to staff area
-      radius: 10,
+      radius: 5,
       opacity: 1,
       color: color,
     };
@@ -99,25 +105,12 @@ class Graphics {
 
   // Add new method to create falling notes
   createFallingNote(note, key, color) {
-    const staffTop = this.canvas.height / 3;
-    const lineSpacing = this.canvas.height / 12;
-
-    // Calculate positions for top 3 lines
-    const startLines = [
-      staffTop, // First line
-      staffTop + lineSpacing, // Second line
-      staffTop + lineSpacing * 2, // Third line
-    ];
-
-    const startY = startLines[Math.floor(Math.random() * startLines.length)];
-
     const noteObj = {
       note: note,
       x: 50 + key.charCodeAt(0) * 10,
-      y: startY,
-      currentLine: Math.floor((startY - staffTop) / lineSpacing),
-      progress: 0, // Progress through current arc (0 to 1)
-      radius: 10,
+      y: 0, // Start at top
+      vy: 0, // Vertical velocity
+      radius: 8,
       color: color,
       active: true,
     };
@@ -147,37 +140,30 @@ class Graphics {
       return true;
     });
 
-    const staffTop = this.canvas.height / 3;
-    const lineSpacing = this.canvas.height / 12;
-
     // Then draw falling notes
     this.fallingNotes.forEach((note) => {
-      // Update progress
-      note.progress += 0.05; // Controls speed of movement
+      note.vy += this.gravity;
+      note.y += note.vy;
 
-      if (note.progress >= 1) {
-        // Move to next line
-        note.currentLine++;
-        note.progress = 0;
-        // Create splash when landing on a line
-        this.splashColor(note.color);
-      }
+      const staffTop = this.canvas.height / 3;
+      const lineSpacing = this.canvas.height / 12;
+      const staffLines = Array(5)
+        .fill(0)
+        .map((_, i) => staffTop + i * lineSpacing);
 
-      // Calculate current and next line y-positions
-      const currentLineY = staffTop + note.currentLine * lineSpacing;
-      const nextLineY = currentLineY + lineSpacing;
+      staffLines.forEach((lineY) => {
+        if (
+          note.y + note.radius > lineY &&
+          note.y + note.radius < lineY + note.vy &&
+          note.vy > 0
+        ) {
+          note.y = lineY - note.radius;
+          note.vy *= -this.bounce;
+          // Create a splash when note hits a line
+          this.splashColor(note.color);
+        }
+      });
 
-      // Create parabolic arc between lines
-      const t = note.progress;
-      const arcHeight = lineSpacing * 0.3; // Maximum height of the arc
-
-      // Parabolic interpolation
-      note.y =
-        currentLineY +
-        t * lineSpacing + // Linear movement down
-        -4 * arcHeight * t * (t - 1); // Parabolic arc
-
-      // Draw the note
       this.ctx.beginPath();
       this.ctx.arc(note.x, note.y, note.radius, 0, 2 * Math.PI);
       this.ctx.fillStyle = note.color;
@@ -185,10 +171,9 @@ class Graphics {
       this.ctx.closePath();
     });
 
-    // Clean up notes that have passed the last line
-    const lastLineY = staffTop + lineSpacing * 4;
+    // Clean up settled notes
     this.fallingNotes = this.fallingNotes.filter(
-      (note) => note.currentLine < 5 // Remove after passing last line
+      (note) => Math.abs(note.vy) > 0.1 || note.y < this.canvas.height
     );
 
     requestAnimationFrame(() => this.animate());
@@ -199,4 +184,14 @@ class Graphics {
     //this.splashColor(color);
     this.createFallingNote(note, key, color);
   }
+
+  // drawNoteOnPress(note, key, color) {
+  //   // Draw note on canvas and add splash effect
+  //   this.playNote(note, key, color);
+  //   this.splashColor(
+  //     color,
+  //     50 + key.charCodeAt(0) * 10,
+  //     100 + Math.random() * 200
+  //   );
+  // }
 }

@@ -15,6 +15,7 @@
         color: teal;
         /* padding: 20px; */
         box-sizing: border-box;
+        background-color: rgb(240, 240, 240);
       }
 
       header {
@@ -181,7 +182,37 @@
     <div class="game-container">
       <h1>THE Easiest Game</h1>
 
-      <canvas id="musicSheet" width="400px" height="200px"></canvas>
+      <div style="display: flex; align-items: flex-start">
+        <div
+          style="
+            height: 160px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 8px 0;
+          "
+        >
+          <ul style="margin: 0; padding: 0; list-style-type: none">
+            <li style="color: rgb(240, 240, 240)">C</li>
+            <li style="color: rgb(240, 240, 240)">C</li>
+            <li style="color: rgb(240, 240, 240)">C</li>
+            <li>C</li>
+            <li>B</li>
+            <li>A</li>
+            <li>G</li>
+            <li>F</li>
+            <li>E</li>
+            <li>D</li>
+            <li>C</li>
+          </ul>
+        </div>
+        <canvas
+          id="musicSheet"
+          width="350"
+          height="200"
+          style="display: block; margin: 0"
+        ></canvas>
+      </div>
 
       <div id="instrument-wrapper" class="instrument-wrapper"></div>
       <audio id="audio" preload="auto"></audio>
