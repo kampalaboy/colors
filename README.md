@@ -47,3 +47,15 @@ MAKES USE OF THE PARTICLES PHYSICS
   This essentialy takes both ideas from festival and
   code games and connects to a web socket server to challenge others.
   Still working exactly what that means...
+
+# You can play over here:
+
+    https://colors-production-b2a3.up.railway.app
+
+# Or You can run locally by:
+
+    git clone https://github.com/kampalaboy/colors.git
+
+    cd colors
+
+    go run \*.go
