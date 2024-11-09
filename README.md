@@ -2,7 +2,7 @@ Color and Music Coding Game.
 
 Go to the refactor branch for latest working concept.
 
-/\* : .. . . .> - . .\*/\
+`/   \ *     :   . .    .        .    .> -  . .  \*   /  \`
 Simulates the physics of Large Hodran Collider.
 
 MAKES USE OF THE PARTICLES PHYSICS
