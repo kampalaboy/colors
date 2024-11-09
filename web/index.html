@@ -16,7 +16,7 @@
         color: teal;
         /* padding: 20px; */
         box-sizing: border-box;
-        background-color: rgb(210, 210, 210);
+        background-color: rgb(230, 230, 230);
       }
 
       header {
@@ -76,7 +76,6 @@
         text-align: center;
         margin: 0;
         line-height: 1.5;
-        padding-bottom: 5px;
       }
 
       .instrument-button {
@@ -180,27 +179,23 @@
     <div class="game-container">
       <h1>THE Easiest Game</h1>
       <div id="status"></div>
-      <div style="display: flex; align-items: flex-start; margin-top: 0">
+      <div style="display: flex; align-items: flex-start; margin-top: 0;">
         <div
           style="
-            height: 160px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 8px 0;
+            padding: 0;
           "
         >
           <ul
             style="
               margin: 0;
-              padding: 0;
+              padding-top: 62px;
               list-style-type: none;
               font-weight: bold;
             "
           >
-            <li style="color: rgb(240, 240, 240)">C</li>
-            <li style="color: rgb(240, 240, 240)">C</li>
-            <li style="color: rgb(240, 240, 240)">C</li>
             <li>Dr</li>
             <li>B</li>
             <li>A</li>
@@ -215,13 +210,12 @@
           id="musicSheet"
           width="350"
           height="216"
-          style="display: block; margin: 0"
+          style="display: block; margin: 0; padding: 0;"
         ></canvas>
       </div>
-
+      
       <div id="instrument-wrapper" class="instrument-wrapper"></div>
-      <audio id="audio" preload="auto"></audio>
-    </div>
+      
 
     <script src="js/graphics.js"></script>
     <script src="js/player.js"></script>
