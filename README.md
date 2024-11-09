@@ -58,4 +58,4 @@ MAKES USE OF THE PARTICLES PHYSICS
 
     cd colors
 
-    go run \*.go
+    `go run *.go`
