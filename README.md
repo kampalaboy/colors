@@ -48,9 +48,9 @@ MAKES USE OF THE PARTICLES PHYSICS
   code games and connects to a web socket server to challenge others.
   Still working exactly what that means...
 
-# You can play over here:
+* You can play over here:
 
-    https://colors-production-b2a3.up.railway.app
+  https://colors-production-b2a3.up.railway.app
 
 # Or You can run locally by:
 
