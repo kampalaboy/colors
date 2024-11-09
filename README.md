@@ -3,8 +3,28 @@ Color and Music Coding Game.
 Go to the refactor branch for latest working concept.
 
 `/   \ *     :   . .    .        .    .> -  . .  \*   /  \`
-\n
-Simulates the physics of Large Hodran Collider.
+
+# Simulates the physics of Large Hodran Collider with simple Cartesian distance formula
+
+    // Check collisions between bullets and splashes
+    this.bulletStream.forEach((bullet, bulletIndex) => {
+      this.splashes.forEach((splash, splashIndex) => {
+        const dx = bullet.x - splash.x;
+        const dy = bullet.y - splash.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        if (distance < bullet.radius + splash.radius) {
+          // Collision detected! Create explosion
+          this.createExplosion(bullet.x, bullet.y, splash.color);
+
+          // Remove collided bullet
+          this.bulletStream.splice(bulletIndex, 1);
+
+          // Instead of creating new splash, just reset opacity of existing one
+          splash.opacity = 1;
+        }
+      })
+    })
 
 MAKES USE OF THE PARTICLES PHYSICS
 
