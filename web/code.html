@@ -4,7 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>COLORS</title>
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="favicon.ico" type="image/x-icon" />
     <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        color: teal;
+        /* padding: 20px; */
+        box-sizing: border-box;
+        background-color: rgb(230, 230, 230);
+      }
+
+      header {
+        width: 100%;
+        margin-bottom: 20px;
+      }
+
       nav ul {
         display: flex;
         justify-content: center;
@@ -24,6 +43,120 @@
         color: #000;
         font-size: 18px;
       }
+
+      h1 {
+        text-align: center;
+        margin: 0;
+      }
+
+      .game-container {
+        width: 100%;
+        max-width: 600px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0;
+      }
+
+      button {
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        margin: 5px;
+        border: 2px solid #333;
+        border-radius: 4px;
+        background-color: #fff;
+      }
+
+      button:hover {
+        background-color: #f0f0f0;
+      }
+
+      #status {
+        text-align: center;
+        margin: 0;
+        line-height: 1.5;
+      }
+
+      .instrument-button {
+        height: 150px;
+        margin: 3px;
+        border: solid black 2px;
+      }
+
+      #score,
+      #clicks {
+        font-size: 50px;
+        text-align: center;
+        margin: 10px 10px;
+      }
+
+      .button-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+      }
+
+      .instrument-wrapper {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        bottom: 0;
+        padding: 10px;
+      }
+
+      @media (max-width: 768px) {
+        .instrument-button {
+          height: 150px;
+          width: 5px;
+          margin: 2px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .instrument-button {
+          height: 150px;
+          width: 10px;
+          margin: 2px;
+        }
+      }
+
+      @media (max-width: 600px) {
+        nav ul {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        nav ul li {
+          padding: 10px;
+        }
+
+        button {
+          width: 100%;
+          max-width: 300px;
+          margin: 5px 0;
+        }
+
+        #score,
+        #clicks {
+          font-size: 36px;
+        }
+
+        .instrument-wrapper {
+          width: calc(100% - 100px);
+          padding: 10px;
+          margin: 0 10px;
+          -webkit-overflow-scrolling: touch;
+        }
+
+        .instrument-wrapper::-webkit-scrollbar {
+          height: 4px;
+        }
+
+        .instrument-wrapper::-webkit-scrollbar-thumb {
+          border-radius: 2px;
+        }
+      }
     </style>
   </head>
   <body>
@@ -36,44 +169,49 @@
         </ul>
       </nav>
     </header>
-    <div
-      style="
-        display: flex;
+
+    <div class="game-container">
+      <h1>Musical Card Game</h1>
+      <div id="status"></div>
+      <div id="cards-slot"></div>
+      <div style="display: flex; justify-content: center;">
+        <!-- <div style="            
         flex-direction: column;
-        margin: 0;
-        height: 50vh;
-        justify-content: center;
-        align-items: center;
-        font-size: 50px;
-      "
-    >
-      <p>Coming Soon</p>
-      <p id="xmas"></p>
-    </div>
+        justify-content: space-between;
+        padding-top: 62px;
+          ">
+          <ul
+            style="
+            margin: 0;
+            padding: 0;
+              list-style-type: none;
+              font-weight: bold;
+            "
+          >
+            <li>Dr</li>
+            <li>A♠️</li>
+            <li>Q♥️</li>
+            <li>Q♦️</li>
+            <li>K♦️</li>
+            <li>J♣️</li>
+            <li>10♦️</li>
+            <li>10♠️</li>
+          </ul>
+        </div> -->
+        <canvas
+          id="radar"
+          width="350"
+          height="350"
+          style="background-color: #000; display: block; margin: 0; padding: 0;"
+        ></canvas>
+      </div>
+      
+      <div id="instrument-wrapper" class="instrument-wrapper"></div>
+      
 
-    <script>
-      var countDownDate = new Date("Dec 25, 2024 00:00:00").getTime();
-
-      var x = setInterval(function () {
-        var now = new Date().getTime();
-
-        var distance = countDownDate - now;
-
-        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-        var hours = Math.floor(
-          (distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)
-        );
-        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-        document.getElementById("xmas").innerHTML =
-          days + "d " + hours + "h " + minutes + "m " + seconds + "s ";
-
-        if (distance < 0) {
-          clearInterval(x);
-          document.getElementById("xmas").innerHTML = "EXPIRED";
-        }
-      }, 1000);
-    </script>
+    <!-- <script src="js/graphics.js"></script> -->
+     <script src="js/radarGraphics.js"></script>
+     <script src="js/player.js"></script>
+    <script src="js/coder.js"></script>
   </body>
 </html>

@@ -1,14 +1,10 @@
-class Graphics {
+class SheetGraphics {
   constructor(sheet) {
     this.sheet = sheet;
     this.canvas = document.getElementById("musicSheet");
     this.ctx = this.canvas.getContext("2d");
     this.bulletStream = [];
     this.splashes = []; // Add this to track active splashes
-
-    this.fallingNotes = []; // Track active falling notes
-    this.gravity = 0.2; // Gravity constant
-    this.bounce = 0.6; // Bounce dampening (0-1)
 
     this.explosions = []; // Add this to track explosions
 
@@ -70,25 +66,7 @@ class Graphics {
     }
   }
 
-  playNote(note, key, color) {
-    const staffTop = this.canvas.height / 3;
-    const lineSpacing = this.canvas.height / 12;
-    const staffBottom = staffTop + lineSpacing * 4;
-
-    const x = 50 + key.charCodeAt(0) * 10;
-    const y = staffTop + Math.random() * (staffBottom - staffTop); // Constrain to staff area
-
-    this.ctx.beginPath();
-    this.ctx.arc(x, y, 8, 0, 2 * Math.PI);
-    this.ctx.fillStyle = color;
-    this.ctx.fill();
-    this.ctx.closePath();
-
-    console.log(`Playing note: ${note}, at position (${x}, ${y})`);
-  }
-
   splashColor(color, note) {
-    console.log("splashColor called from:", new Error().stack); // This will show us where it's being called from
     const staffTop = this.canvas.height / 3;
     const lineSpacing = this.canvas.height / 12;
     const staffBottom = staffTop + lineSpacing * 7;
@@ -130,28 +108,6 @@ class Graphics {
     this.splashes.push(splash);
   }
 
-  // Add new method to create falling notes
-  createFallingNote(note, key, color) {
-    const staffTop = this.canvas.height / 3;
-    const lineSpacing = this.canvas.height / 12;
-    //const staffBottom = staffTop + lineSpacing * 8;
-
-    //const startY = startLines[Math.floor(Math.random() * startLines.length)];
-
-    const noteObj = {
-      note: note,
-      x: 50 + key.charCodeAt(0) * 10,
-      y: 0, //startY,
-      currentLine: Math.floor((startY - staffTop) / lineSpacing),
-      progress: 0, // Progress through current arc (0 to 1)
-      radius: 10,
-      color: color,
-      active: true,
-    };
-
-    this.fallingNotes.push(noteObj);
-  }
-
   // Random Bullets coming from right to left
   streamBullets() {
     // Create new bullets periodically
@@ -169,7 +125,7 @@ class Graphics {
         { min: staffTop + lineSpacing * 4, max: staffTop + lineSpacing * 5 }, // Between lines 5-6
         { min: staffTop + lineSpacing * 5, max: staffTop + lineSpacing * 6 }, // Between lines 6-7
         { min: staffTop + lineSpacing * 6, max: staffTop + lineSpacing * 7 }, // Between line 7-8
-        { min: staffTop + lineSpacing * 7, max: staffTop + lineSpacing * 8 }, // Between line 7-8
+        { min: staffTop + lineSpacing * 7, max: staffTop + lineSpacing * 8 }, // Between line 8-9
       ];
 
       // Randomly choose a gap between staff lines
@@ -277,8 +233,8 @@ class Graphics {
     this.drawMusicSheet();
 
     // Draw splashes first
-    console.log("Current splashes:", this.splashes.length); // Debug log
-    console.log("Current explosions:", this.explosions.length);
+    // console.log("Current splashes:", this.splashes.length); // Debug log
+    // console.log("Current explosions:", this.explosions.length);
     this.splashes = this.splashes.filter((splash) => {
       splash.opacity -= 0.02;
 
@@ -369,7 +325,7 @@ class Graphics {
   }
 
   // Modify drawNoteOnPress to create both a splash and a falling note
-  drawNoteOnPress(note, key, color) {
+  drawNoteOnPress(note, color) {
     console.log("Drawing note with color:", color); // Debug log
     this.splashColor(color, note);
     //this.createFallingNote(note, key, color);
